@@ -1,72 +1,144 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PLATO
 
-## Getting Started
+PLATO is the official repository for a multi-tenant restaurant platform. It gives restaurant owners a platform account, creates a dedicated tenant for each restaurant, and serves each restaurant site from its own subdomain.
 
-First, run the development server:
+The application is built with Next.js, React, TypeScript, and PostgreSQL. Themes and page sections are data-driven so the presentation layer can evolve independently from tenant data.
+
+## Requirements
+
+- Node.js 20.9 or newer
+- npm
+- PostgreSQL 14 or newer, running locally or hosted
+
+## Initialize locally
+
+Clone the repository and install dependencies:
+
+```bash
+git clone https://github.com/ahmaadsaim/plato-fyp.git
+cd fyp-plato
+npm install
+```
+
+Create `.env.local` in the project root:
+
+```env
+# PostgreSQL connection string used by the pg client
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/plato
+
+# Use a long random value in every shared or production environment
+AUTH_SECRET=replace-with-a-long-random-secret
+
+# Local tenant URLs are http://<slug>.localhost:3000
+# In production, set this to the platform domain without https://
+PLATFORM_DOMAIN=localhost
+```
+
+`.env.local` is ignored by Git. Never commit database credentials or production secrets.
+
+## Initialize the database
+
+Create a PostgreSQL database named `plato` if it does not already exist:
+
+```bash
+createdb plato
+```
+
+Apply the schema:
+
+```bash
+psql "$DATABASE_URL" -f lib/schema.sql
+```
+
+If your shell does not load `.env.local` automatically, provide the connection string directly:
+
+```bash
+psql "postgresql://postgres:postgres@localhost:5432/plato" -f lib/schema.sql
+```
+
+The schema creates the `users` and `tenants` tables and the indexes required for tenant lookup. The application creates user and tenant records through its server actions; no seed script is required for a fresh install.
+
+## Run the application
+
+Start the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000). Useful routes are:
 
-### Platform hostname configuration
+- `/` for the platform home page.
+- `/signup` and `/login` for authentication.
+- `/dashboard` for creating and viewing restaurants.
+- `/demo` for the theme gallery.
 
-Copy `.env.example` to `.env.local` for local development. Set `PLATFORM_DOMAIN`
-to the hostname attached to the deployment, without a protocol:
+After creating a restaurant with the slug `pizza-house`, open `http://pizza-house.localhost:3000`. Modern browsers resolve `*.localhost` to the local machine. If this does not work in your environment, use the request host override supported by the development setup or add the hostname to `/etc/hosts`.
 
-```env
-PLATFORM_DOMAIN=myapp.com
+## Commands
+
+```bash
+npm run dev       # Start the development server
+npm run lint      # Run ESLint
+npm run build     # Create a production build
+npm run start     # Serve the production build
 ```
 
-Tenant URLs then use `http://<slug>.localhost:3000` locally and
-`https://<slug>.myapp.com` in production. Configure the corresponding wildcard
-domain (`*.myapp.com`) in Vercel and DNS so those tenant requests reach this app.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Project Structure
-
-The codebase keeps route entry points, domain logic, rendering, and editable configuration separate:
+## Project structure
 
 ```text
-app/                 Next.js routes and server actions
-components/           Reusable UI and section components
-data/                 Local catalog JSON used by the catalog repository
-lib/theme/            Theme contracts, theme JSON repository, and token helpers
-lib/catalog/          Restaurant catalog repository and future tenant data access
-renderer/             Theme and section rendering orchestration only
-themes/<id>/          Editable theme JSON, page definitions, and theme notes
+app/                 Routes and server actions
+components/          Reusable UI and feature components
+data/                Local catalog JSON data
+lib/auth/            Session and password helpers
+lib/catalog/         Catalog repository boundary
+lib/db/              PostgreSQL pool and query helpers
+lib/theme/           Theme contracts, repositories, and token helpers
+renderer/            Theme and section rendering orchestration
+themes/<id>/         Theme JSON, page definitions, and theme notes
 ```
 
-### Theme and demo workflow
+### Adding a theme
 
-1. Add or edit a theme under `themes/<theme-id>/theme.json`.
-2. Define page section order and settings in `themes/<theme-id>/pages/<page>.json`.
-3. Add reusable section implementations in `components/sections/` and register them in `renderer/sectionRegistry.ts`.
-4. Use `/demo` to discover themes and `/demo/<theme-id>` to inspect a theme with live section and token controls.
+1. Add the theme definition at `themes/<theme-id>/theme.json`.
+2. Define page sections in `themes/<theme-id>/pages/<page>.json`.
+3. Add or update reusable sections in `components/sections/` and register them in `renderer/sectionRegistry.ts`.
+4. Inspect the result at `/demo/<theme-id>`.
 
-Theme JSON is loaded by `lib/theme/repository.ts`, catalog JSON by `lib/catalog/repository.ts`, and both are passed into the rendering layer through the demo route. This keeps future database-backed tenant data changes isolated from the renderer and UI components.
+## Production tenant domains
 
-## Learn More
+Set `PLATFORM_DOMAIN` to the public platform hostname without a protocol, for example:
 
-To learn more about Next.js, take a look at the following resources:
+```env
+PLATFORM_DOMAIN=plato.example.com
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Tenant URLs then use `https://<slug>.plato.example.com`. Configure the matching wildcard DNS record and wildcard domain in your hosting provider so `*.plato.example.com` routes to this application. Use a strong production `AUTH_SECRET` and a managed PostgreSQL connection string in the deployment environment.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## AI agent initialization prompt
 
-## Deploy on Vercel
+The code block below is intentionally self-contained. Use the code block's **Copy** button in GitHub or VS Code, then give the prompt to your coding agent to initialize a fresh local checkout:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```text
+You are initializing the PLATO repository, the official multi-tenant restaurant platform.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Work in the repository root and follow the existing codebase conventions. Do not replace working application code or create duplicate database abstractions.
+
+1. Inspect package.json, README.md, lib/db/index.ts, lib/schema.sql, and the app routes before making changes.
+2. Confirm Node.js 20.9+ and npm are available, then run npm install.
+3. Create .env.local if it is missing with:
+   DATABASE_URL=postgresql://postgres:postgres@localhost:5432/plato
+   AUTH_SECRET=<generate a long random local secret>
+   PLATFORM_DOMAIN=localhost
+   Do not commit .env.local or print secrets in the final response.
+4. Confirm PostgreSQL is available. Create the plato database if needed, then apply the schema with:
+   psql "$DATABASE_URL" -f lib/schema.sql
+   If DATABASE_URL is not exported by the shell, read the value from .env.local without exposing it and run the equivalent psql command.
+5. Run npm run lint and fix only errors caused by initialization. Do not make unrelated refactors.
+6. Start the app with npm run dev and verify that the platform home page, /signup, /login, /dashboard, and /demo respond correctly.
+7. Report the exact initialization steps completed, any prerequisite that needs manual action, and the local URL. Never claim the database was initialized unless the schema command succeeded.
+```
+
+## Contributing
+
+Keep tenant-aware behavior behind the repository and resolver boundaries. Prefer existing theme, catalog, database, and renderer abstractions before adding new ones. Run `npm run lint` and `npm run build` before opening a pull request.
