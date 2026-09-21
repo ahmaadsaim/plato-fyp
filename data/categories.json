@@ -1,0 +1,47 @@
+[
+  {
+    "id": "cat-burgers",
+    "slug": "craft-burgers",
+    "name": "Craft Burgers",
+    "description": "Double smash Wagyu patties, brioche buns, melted cheddar, and secret house relish.",
+    "icon": "🍔",
+    "image": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=800&q=80",
+    "itemCount": 3
+  },
+  {
+    "id": "cat-pizza",
+    "slug": "stone-fired-pizza",
+    "name": "Stone-Fired Pizzas",
+    "description": "48-hour fermented dough, San Marzano DOP tomatoes, and fresh buffalo mozzarella.",
+    "icon": "🍕",
+    "image": "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=800&q=80",
+    "itemCount": 3
+  },
+  {
+    "id": "cat-pasta",
+    "slug": "artisan-pasta",
+    "name": "Handmade Pasta",
+    "description": "Fresh pasta extruded daily, paired with slow-simmered bolognese and truffle emulsions.",
+    "icon": "🍝",
+    "image": "https://images.unsplash.com/photo-1621996346565-e3d5d6281682?auto=format&fit=crop&w=800&q=80",
+    "itemCount": 3
+  },
+  {
+    "id": "cat-drinks",
+    "slug": "craft-beverages",
+    "name": "Craft Beverages",
+    "description": "Botanical sparkling spritzes, cold-pressed citrus elixirs, and nitro cold brew.",
+    "icon": "🥤",
+    "image": "https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=800&q=80",
+    "itemCount": 2
+  },
+  {
+    "id": "cat-desserts",
+    "slug": "decadent-sweets",
+    "name": "Decadent Sweets",
+    "description": "Molten Belgian chocolate cakes, Madagascar vanilla bean panna cotta, and cannoli.",
+    "icon": "🍰",
+    "image": "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=800&q=80",
+    "itemCount": 2
+  }
+]

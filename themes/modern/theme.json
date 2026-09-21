@@ -1,0 +1,69 @@
+{
+  "id": "modern",
+  "name": "Modern Restaurant",
+  "version": "1.0.0",
+  "description": "A sleek, appetizing restaurant storefront theme featuring warm amber and charcoal tones, dynamic typography, elegant food imagery, and responsive section layouts.",
+  "metadata": {
+    "author": "Plato Platform Team",
+    "category": "Food & Beverage",
+    "tags": ["Fast Casual", "Artisanal", "Bistro", "Pizzeria", "Burgers"],
+    "previewImage": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1000&q=80"
+  },
+  "tokens": {
+    "colors": {
+      "primary": "#E05A2B",
+      "primaryHover": "#C84B1F",
+      "secondary": "#1A1A1A",
+      "secondaryHover": "#2D2D2D",
+      "background": "#0D0F12",
+      "surface": "#16191F",
+      "surfaceCard": "#1E222B",
+      "surfaceHover": "#272C38",
+      "text": "#F8FAFC",
+      "mutedText": "#94A3B8",
+      "border": "#2E3646",
+      "accent": "#F59E0B",
+      "accentBg": "#2A2016",
+      "badge": "#E05A2B",
+      "badgeText": "#FFFFFF",
+      "price": "#34D399"
+    },
+    "typography": {
+      "fontFamily": "var(--font-geist-sans), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+      "headingFont": "var(--font-geist-sans), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+      "headingWeight": "700",
+      "bodyWeight": "400",
+      "headingScale": "1.25",
+      "bodySize": "1rem"
+    },
+    "spacing": {
+      "section": "4.5rem",
+      "container": "1.5rem",
+      "card": "1.25rem",
+      "element": "0.75rem"
+    },
+    "radius": {
+      "small": "0.375rem",
+      "medium": "0.75rem",
+      "large": "1.25rem",
+      "full": "9999px"
+    },
+    "shadows": {
+      "sm": "0 1px 2px 0 rgba(0, 0, 0, 0.4)",
+      "card": "0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5)",
+      "floating": "0 20px 35px -5px rgba(224, 90, 43, 0.25), 0 10px 10px -5px rgba(0, 0, 0, 0.4)"
+    },
+    "layout": {
+      "maxWidth": "1280px",
+      "productColumns": 4
+    }
+  },
+  "supportedSections": [
+    "navbar",
+    "hero",
+    "categories",
+    "product-grid",
+    "promo",
+    "footer"
+  ]
+}
