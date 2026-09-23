@@ -24,23 +24,17 @@ export { extractSlugFromHost } from "./host";
  */
 export async function resolveTenant(hostOverride?: string): Promise<Tenant | null> {
   let host = hostOverride;
-  let headerSlug: string | null = null;
 
   if (!host) {
     try {
       const headersList = await headers();
-      headerSlug = headersList.get("x-tenant-slug");
-      host =
-        headersList.get("x-tenant-host") ||
-        headersList.get("x-forwarded-host") ||
-        headersList.get("host") ||
-        "";
+      host = headersList.get("host") || "";
     } catch {
       host = "";
     }
   }
 
-  const slug = headerSlug || extractSlugFromHost(host);
+  const slug = extractSlugFromHost(host);
 
   // If no tenant subdomain, this is the platform hostname.
   if (!slug) {

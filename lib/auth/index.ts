@@ -17,11 +17,19 @@ export interface User {
 
 const SESSION_COOKIE_NAME = "plato_session";
 
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.AUTH_SECRET || "plato-multi-tenant-auth-secret-key-32-bytes!!"
-);
-
 const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 7; // 7 days
+
+function getJwtSecret(): Uint8Array {
+  const secret = process.env.AUTH_SECRET;
+
+  if (!secret && process.env.NODE_ENV === "production") {
+    throw new Error("AUTH_SECRET must be configured in production.");
+  }
+
+  return new TextEncoder().encode(
+    secret || "local-development-secret-change-me"
+  );
+}
 
 // ─── Password Helpers ─────────────────────────────────────────────────────────
 
@@ -43,15 +51,12 @@ export async function createSession(user: {
   name: string;
   email: string;
 }) {
-  const token = await new SignJWT({
-    name: user.name,
-    email: user.email,
-  })
+  const token = await new SignJWT({})
     .setSubject(user.id)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime("7d")
-    .sign(JWT_SECRET);
+    .sign(getJwtSecret());
 
   const cookieStore = await cookies();
   cookieStore.set(SESSION_COOKIE_NAME, token, {
@@ -77,7 +82,9 @@ export async function getSessionUser(): Promise<User | null> {
   if (!token) return null;
 
   try {
-    const { payload } = await jwtVerify(token, JWT_SECRET);
+    const { payload } = await jwtVerify(token, getJwtSecret(), {
+      algorithms: ["HS256"],
+    });
     const userId = payload.sub;
     if (!userId) return null;
 
@@ -89,6 +96,8 @@ export async function getSessionUser(): Promise<User | null> {
     return null;
   }
 }
+
+export const getCurrentUser = getSessionUser;
 
 /** Returns the current session user, redirecting to /login if not authenticated. */
 export async function requireUser(): Promise<User> {

@@ -6,10 +6,6 @@ export function proxy(request: NextRequest) {
   const url = request.nextUrl;
   const hostname = request.headers.get("host") || "";
 
-  // Forward hostname in headers for server components & tenant resolution
-  const requestHeaders = new Headers(request.headers);
-  requestHeaders.set("x-tenant-host", hostname);
-
   // Strictly block any attempt to access tenants via /tenant/* path
   if (url.pathname.startsWith("/tenant")) {
     return new NextResponse("Not Found", { status: 404 });
@@ -18,8 +14,6 @@ export function proxy(request: NextRequest) {
   const subdomain = extractSlugFromHost(hostname);
 
   if (subdomain) {
-    requestHeaders.set("x-tenant-slug", subdomain);
-
     // Private routes must only be accessed from the platform domain.
     if (url.pathname.startsWith("/dashboard")) {
       return NextResponse.redirect(
@@ -28,18 +22,10 @@ export function proxy(request: NextRequest) {
     }
 
     // Public tenant website renders at "/".
-    return NextResponse.next({
-      request: {
-        headers: requestHeaders,
-      },
-    });
+    return NextResponse.next();
   }
 
-  return NextResponse.next({
-    request: {
-      headers: requestHeaders,
-    },
-  });
+  return NextResponse.next();
 }
 
 export const config = {
