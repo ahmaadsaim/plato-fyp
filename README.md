@@ -31,7 +31,7 @@ AUTH_SECRET=replace-with-a-long-random-secret
 
 # Local tenant URLs are http://<slug>.localhost:3000
 # In production, set this to the platform domain without https://
-PLATFORM_DOMAIN=localhost
+PLATFORM_DOMAIN=localhost:3000
 ```
 
 `.env.local` is ignored by Git. Never commit database credentials or production secrets.
@@ -110,7 +110,7 @@ themes/<id>/         Theme JSON, page definitions, and theme notes
 Set `PLATFORM_DOMAIN` to the public platform hostname without a protocol, for example:
 
 ```env
-PLATFORM_DOMAIN=plato.example.com
+PLATFORM_DOMAIN=localhost:3000
 ```
 
 Tenant URLs then use `https://<slug>.plato.example.com`. Configure the matching wildcard DNS record and wildcard domain in your hosting provider so `*.plato.example.com` routes to this application. Use a strong production `AUTH_SECRET` and a managed PostgreSQL connection string in the deployment environment.
@@ -129,7 +129,7 @@ Work in the repository root and follow the existing codebase conventions. Do not
 3. Create .env.local if it is missing with:
    DATABASE_URL=postgresql://postgres:postgres@localhost:5432/plato
    AUTH_SECRET=<generate a long random local secret>
-   PLATFORM_DOMAIN=localhost
+   PLATFORM_DOMAIN=localhost:3000
    Do not commit .env.local or print secrets in the final response.
 4. Confirm PostgreSQL is available. Create the plato database if needed, then apply the schema with:
    psql "$DATABASE_URL" -f lib/schema.sql
