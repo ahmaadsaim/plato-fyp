@@ -1,0 +1,206 @@
+{
+  "storeId": "burger-craft",
+  "metadata": {
+    "name": "Burger Craft & Co.",
+    "tagline": "SMASHED TO PERFECTION",
+    "description": "Handcrafted dry-aged Angus smashed patties, toasted brioche buns, and house-made secret sauces.",
+    "logo": "/classic-beef-burger.png",
+    "favicon": "/icon.svg",
+    "currency": {
+      "symbol": "$",
+      "code": "USD",
+      "position": "before"
+    },
+    "contact": {
+      "phone": "+1 (555) 789-0123",
+      "email": "hello@burgercraft.co",
+      "address": "742 Evergreen Terrace, Chicago, IL 60601",
+      "city": "Chicago",
+      "country": "USA",
+      "whatsapp": "+15557890123"
+    },
+    "openingHours": [
+      {
+        "days": "Monday - Thursday",
+        "hours": "11:00 AM - 11:00 PM"
+      },
+      {
+        "days": "Friday - Sunday",
+        "hours": "11:00 AM - 1:00 AM"
+      }
+    ],
+    "socialLinks": {
+      "facebook": "https://facebook.com",
+      "instagram": "https://instagram.com",
+      "twitter": "https://twitter.com"
+    },
+    "theme": {
+      "primaryColor": "#f59e0b",
+      "primaryForeground": "#000000",
+      "accentColor": "#d97706",
+      "borderRadius": "0.75rem"
+    },
+    "delivery": {
+      "fee": 3.99,
+      "freeDeliveryAbove": 30.00,
+      "estimatedTimeMin": 20,
+      "estimatedTimeMax": 35,
+      "minimumOrder": 12.00
+    },
+    "features": {
+      "enableCallAndOrder": true,
+      "enableBranchSelector": true,
+      "enableOrderNotes": true,
+      "enableWhatsAppOrder": true
+    }
+  },
+  "branches": [
+    {
+      "id": 1,
+      "name": "West Loop Flagship",
+      "address": "742 Evergreen Terrace, Chicago, IL",
+      "phone": "+1 (555) 789-0123",
+      "city": "Chicago",
+      "isActive": true
+    },
+    {
+      "id": 2,
+      "name": "Wicker Park",
+      "address": "1420 Milwaukee Ave, Chicago, IL",
+      "phone": "+1 (555) 789-0124",
+      "city": "Chicago",
+      "isActive": false
+    }
+  ],
+  "heroBanners": [
+    {
+      "id": 1,
+      "image": "/hero_banner/Saint Stack Banner.svg",
+      "alt": "Double Smash Bacon Burger",
+      "title": "Double Smash Bacon",
+      "subtitle": "Signature Crispy Patty"
+    },
+    {
+      "id": 2,
+      "image": "/hero_banner/Holy Moly Banner.svg",
+      "alt": "Ghost Pepper Crunch",
+      "title": "Ghost Pepper Crunch",
+      "subtitle": "Spicy Aioli & Pickles"
+    }
+  ],
+  "categories": [
+    {
+      "id": 1,
+      "name": "Smash Burgers",
+      "banner": "/category_banner/PREMIUM BEEF.svg"
+    },
+    {
+      "id": 2,
+      "name": "Crispy Chicken",
+      "banner": "/category_banner/CHICKEN BURGER.svg"
+    },
+    {
+      "id": 3,
+      "name": "Loaded Fries & Sides"
+    },
+    {
+      "id": 4,
+      "name": "Shakes & Drinks"
+    }
+  ],
+  "globalAddOns": [
+    { "name": "Extra Angus Patty", "price": 3.50 },
+    { "name": "Smoked Applewood Bacon", "price": 2.00 },
+    { "name": "Truffle Mayo Dip", "price": 1.50 },
+    { "name": "Melted Aged Cheddar", "price": 1.25 }
+  ],
+  "globalMealOptions": [
+    {
+      "name": "Combo: Crinkle Fries + Craft Soda",
+      "description": "Includes sea-salt crinkle fries and your choice of fountain drink",
+      "price": 4.99
+    },
+    {
+      "name": "Super Combo: Truffle Fries + Thick Shake",
+      "description": "Upgrade to parmesan truffle fries and handcrafted vanilla bean milkshake",
+      "price": 7.99
+    }
+  ],
+  "products": [
+    {
+      "id": 101,
+      "name": "The Oklahoma Onion Smasher",
+      "description": "Two 100% Angus patties smashed with shaved sweet onions, double American cheese, dill pickles, and craft sauce.",
+      "price": 12.99,
+      "image": "/classic-beef-burger.png",
+      "category": 1,
+      "badge": "Bestseller",
+      "isAvailable": true
+    },
+    {
+      "id": 102,
+      "name": "Bacon Jam Truffle Burger",
+      "description": "Crispy bacon onion marmalade, fontina cheese, black truffle aioli, baby arugula on toasted brioche.",
+      "price": 14.50,
+      "image": "/double-patty-burger.png",
+      "category": 1,
+      "badge": "Chef Special",
+      "isAvailable": true
+    },
+    {
+      "id": 103,
+      "name": "Nashville Hot Crunch Chicken",
+      "description": "Buttermilk fried chicken breast dunked in chili oil, creamy slaw, pickled jalapenos, and honey drizzle.",
+      "price": 11.99,
+      "image": "/crispy-chicken-burger.png",
+      "category": 2,
+      "badge": "Spicy",
+      "isAvailable": true
+    },
+    {
+      "id": 104,
+      "name": "Kimchi Fire Bird",
+      "description": "Crispy fried chicken breast, aged spicy kimchi, gochujang glaze, sesame seeds, kewpie mayo.",
+      "price": 12.49,
+      "image": "/spicy-chicken-burger.png",
+      "category": 2,
+      "isAvailable": true
+    },
+    {
+      "id": 105,
+      "name": "Parmesan Garlic Loaded Fries",
+      "description": "Crisp golden fries tossed in roasted garlic butter, grated parmesan reggiano, and chopped Italian parsley.",
+      "price": 6.99,
+      "image": "/loaded-fries.png",
+      "category": 3,
+      "isAvailable": true
+    },
+    {
+      "id": 106,
+      "name": "Classic Golden Fries",
+      "description": "Skin-on potatoes fried twice for maximal crunch, seasoned with sea salt.",
+      "price": 4.25,
+      "image": "/crispy-fries.jpg",
+      "category": 3,
+      "isAvailable": true
+    },
+    {
+      "id": 107,
+      "name": "Salted Caramel Shake",
+      "description": "Hand-spun Madagascar vanilla ice cream, sea salt flakes, buttery caramel drizzle, and whipped cream.",
+      "price": 6.50,
+      "image": "/ice-cream-sundae.png",
+      "category": 4,
+      "isAvailable": true
+    },
+    {
+      "id": 108,
+      "name": "Craft Sparkling Cola",
+      "description": "Cane sugar artisanal craft cola served chilled with fresh lime wedge.",
+      "price": 3.00,
+      "image": "/refreshing-cola.png",
+      "category": 4,
+      "isAvailable": true
+    }
+  ]
+}

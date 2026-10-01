@@ -1,0 +1,22 @@
+{
+  "name": "Pizza House",
+  "currency": "$ USD",
+  "cuisine": "Artisanal Pizza & Italian",
+  "phone": "+1 (555) 234-5678",
+  "address": "104 Culinary Blvd, Suite A",
+  "hours": "Mon - Sun: 11:00 AM - 10:00 PM",
+  "slug": "pizza-house",
+  "updatedAt": "2026-09-26T04:05:15.629Z",
+  "headline": "Handcrafted Flavors Delivered Fresh",
+  "primaryColor": "#84CC16",
+  "secondaryColor": "#18181B",
+  "textColor": "#09090B",
+  "theme": "modern",
+  "logo": "",
+  "buttonColor": "#84CC16",
+  "buttonTextColor": "#000000",
+  "cardColor": "#FFFFFF",
+  "backgroundColor": "#F8FAFC",
+  "fontStyle": "sans",
+  "animationOption": "smooth"
+}

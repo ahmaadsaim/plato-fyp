@@ -1,0 +1,146 @@
+{
+  "storeId": "velvet-bakery",
+  "metadata": {
+    "name": "Velvet Roasters & Bakery",
+    "tagline": "ARTISAN COFFEE & SOURDOUGH PASTRIES",
+    "description": "Specialty single-origin espresso, slow-fermented sourdough pastries, and European brunch bowls.",
+    "logo": "/placeholder-logo.svg",
+    "favicon": "/icon.svg",
+    "currency": {
+      "symbol": "€",
+      "code": "EUR",
+      "position": "after"
+    },
+    "contact": {
+      "phone": "+33 1 42 68 55 00",
+      "email": "bonjour@velvetbakery.fr",
+      "address": "18 Rue Saint-Honoré, 75001 Paris, France",
+      "city": "Paris",
+      "country": "France",
+      "whatsapp": "+33142685500"
+    },
+    "openingHours": [
+      {
+        "days": "Monday - Sunday",
+        "hours": "7:30 AM - 6:00 PM"
+      }
+    ],
+    "socialLinks": {
+      "facebook": "https://facebook.com",
+      "instagram": "https://instagram.com"
+    },
+    "theme": {
+      "primaryColor": "#b45309",
+      "primaryForeground": "#ffffff",
+      "accentColor": "#d97706",
+      "borderRadius": "0.75rem"
+    },
+    "delivery": {
+      "fee": 2.50,
+      "freeDeliveryAbove": 25.00,
+      "estimatedTimeMin": 15,
+      "estimatedTimeMax": 30,
+      "minimumOrder": 10.00
+    },
+    "features": {
+      "enableCallAndOrder": true,
+      "enableBranchSelector": true,
+      "enableOrderNotes": true,
+      "enableWhatsAppOrder": true
+    }
+  },
+  "branches": [
+    {
+      "id": 1,
+      "name": "Le Marais Cafe",
+      "address": "18 Rue Saint-Honoré, Paris",
+      "phone": "+33 1 42 68 55 00",
+      "city": "Paris",
+      "isActive": true
+    },
+    {
+      "id": 2,
+      "name": "Saint-Germain",
+      "address": "42 Boulevard Saint-Germain, Paris",
+      "phone": "+33 1 42 68 55 01",
+      "city": "Paris",
+      "isActive": false
+    }
+  ],
+  "heroBanners": [
+    {
+      "id": 1,
+      "image": "/hero_banner/Saint Stack Banner.svg",
+      "alt": "Morning Pastry Basket",
+      "title": "Fresh From The Oven",
+      "subtitle": "Warm Croissants & Flat Whites"
+    }
+  ],
+  "categories": [
+    {
+      "id": 1,
+      "name": "Artisan Pastries & Viennoiserie"
+    },
+    {
+      "id": 2,
+      "name": "Specialty Coffee & Teas"
+    },
+    {
+      "id": 3,
+      "name": "Brunch & Sandwiches"
+    }
+  ],
+  "globalAddOns": [
+    { "name": "Oat Milk Sub", "price": 0.60 },
+    { "name": "Extra Espresso Shot", "price": 0.80 },
+    { "name": "Organic Salted Butter", "price": 0.50 },
+    { "name": "House Raspberry Jam", "price": 0.70 }
+  ],
+  "globalMealOptions": [
+    {
+      "name": "Morning Pairing (Hot Drink + Fresh Juice)",
+      "description": "Add a cappuccino or latte plus freshly pressed organic orange juice",
+      "price": 4.50
+    }
+  ],
+  "products": [
+    {
+      "id": 301,
+      "name": "Pistachio Rose Croissant",
+      "description": "Laminated French butter dough filled with pistachio frangipane, topped with dried rose petals and crushed pistachios.",
+      "price": 4.20,
+      "image": "/classic-cheesecake.png",
+      "category": 1,
+      "badge": "Morning Special",
+      "isAvailable": true
+    },
+    {
+      "id": 302,
+      "name": "Valrhona Pain au Chocolat",
+      "description": "Crisp flaky pastry wrapped around two sticks of dark Valrhona 70% bittersweet chocolate.",
+      "price": 3.80,
+      "image": "/decadent-chocolate-cake.png",
+      "category": 1,
+      "badge": "Classic",
+      "isAvailable": true
+    },
+    {
+      "id": 303,
+      "name": "Velvet Flat White (Double)",
+      "description": "Silky micro-foam poured over a double ristretto pulled from our Ethiopian single-origin roast.",
+      "price": 4.50,
+      "image": "/refreshing-cola.png",
+      "category": 2,
+      "isAvailable": true
+    },
+    {
+      "id": 304,
+      "name": "Avocado & Poached Egg Tartine",
+      "description": "Toasted seeded sourdough, smashed Haas avocado, two soft poached eggs, chili flakes, and micro cilantro.",
+      "price": 11.50,
+      "image": "/veggie-burger.png",
+      "category": 3,
+      "isAvailable": true
+    }
+  ]
+}

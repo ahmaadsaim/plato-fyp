@@ -1,0 +1,161 @@
+{
+  "storeId": "sushi-sakura",
+  "metadata": {
+    "name": "Sakura Sushi Bar",
+    "tagline": "MODERN JAPANESE MASTERY",
+    "description": "Artisan nigiri, signature maki rolls, and fresh sashimi crafted with sustainable sushi-grade seafood.",
+    "logo": "/placeholder-logo.svg",
+    "favicon": "/icon.svg",
+    "currency": {
+      "symbol": "$",
+      "code": "USD",
+      "position": "before"
+    },
+    "contact": {
+      "phone": "+1 (555) 345-6789",
+      "email": "orders@sakurasushi.com",
+      "address": "88 Ocean Boulevard, San Francisco, CA 94102",
+      "city": "San Francisco",
+      "country": "USA",
+      "whatsapp": "+15553456789"
+    },
+    "openingHours": [
+      {
+        "days": "Tuesday - Sunday",
+        "hours": "12:00 PM - 10:30 PM"
+      }
+    ],
+    "socialLinks": {
+      "facebook": "https://facebook.com",
+      "instagram": "https://instagram.com"
+    },
+    "theme": {
+      "primaryColor": "#e11d48",
+      "primaryForeground": "#ffffff",
+      "accentColor": "#be123c",
+      "borderRadius": "0.75rem"
+    },
+    "delivery": {
+      "fee": 5.00,
+      "freeDeliveryAbove": 50.00,
+      "estimatedTimeMin": 30,
+      "estimatedTimeMax": 50,
+      "minimumOrder": 20.00
+    },
+    "features": {
+      "enableCallAndOrder": true,
+      "enableBranchSelector": true,
+      "enableOrderNotes": true,
+      "enableWhatsAppOrder": true
+    }
+  },
+  "branches": [
+    {
+      "id": 1,
+      "name": "Financial District",
+      "address": "88 Ocean Boulevard, San Francisco, CA",
+      "phone": "+1 (555) 345-6789",
+      "city": "San Francisco",
+      "isActive": true
+    },
+    {
+      "id": 2,
+      "name": "Mission Bay",
+      "address": "400 Channel Street, San Francisco, CA",
+      "phone": "+1 (555) 345-6790",
+      "city": "San Francisco",
+      "isActive": false
+    }
+  ],
+  "heroBanners": [
+    {
+      "id": 1,
+      "image": "/hero_banner/Saint Stack Banner.svg",
+      "alt": "Sakura Omakase Box",
+      "title": "Chef's Omakase Selection",
+      "subtitle": "Daily Fresh Tuna & Salmon"
+    }
+  ],
+  "categories": [
+    {
+      "id": 1,
+      "name": "Signature Maki Rolls"
+    },
+    {
+      "id": 2,
+      "name": "Nigiri & Sashimi Sets"
+    },
+    {
+      "id": 3,
+      "name": "Sides & Appetizers"
+    }
+  ],
+  "globalAddOns": [
+    { "name": "Fresh Grated Wasabi", "price": 2.00 },
+    { "name": "Spicy Kewpie Aioli", "price": 1.25 },
+    { "name": "Extra Pickled Ginger", "price": 1.00 },
+    { "name": "Crispy Tempura Flakes", "price": 1.50 }
+  ],
+  "globalMealOptions": [
+    {
+      "name": "Bento Upgrade (Miso Soup + Seaweed Salad)",
+      "description": "Includes hot dashi miso soup and toasted sesame wakame salad",
+      "price": 5.50
+    },
+    {
+      "name": "Deluxe Combo (Gyoza + Matcha Iced Tea)",
+      "description": "Includes 3 pork/veggie gyoza and ceremonial unsweetened iced matcha",
+      "price": 7.00
+    }
+  ],
+  "products": [
+    {
+      "id": 201,
+      "name": "Dragon Fire Roll (8 pcs)",
+      "description": "Shrimp tempura, crisp cucumber, topped with torched unagi eel, spicy tuna tartare, tobiko, and unagi glaze.",
+      "price": 18.00,
+      "image": "/spicy-chicken-burger.png",
+      "category": 1,
+      "badge": "Signature",
+      "isAvailable": true
+    },
+    {
+      "id": 202,
+      "name": "Truffle Salmon Aburi Roll (8 pcs)",
+      "description": "Atlantic salmon, avocado, cream cheese, seared with white truffle oil and micro herbs.",
+      "price": 19.50,
+      "image": "/mushroom-burger.png",
+      "category": 1,
+      "badge": "Popular",
+      "isAvailable": true
+    },
+    {
+      "id": 203,
+      "name": "Supreme Sashimi Platter (12 pcs)",
+      "description": "Chef selection of bluefin tuna, king salmon, yellowtail hamachi, and Hokkaido scallop with fresh shiso.",
+      "price": 28.00,
+      "image": "/classic-beef-burger.png",
+      "category": 2,
+      "badge": "Raw Bar",
+      "isAvailable": true
+    },
+    {
+      "id": 204,
+      "name": "Pan-Fried Pork Gyoza (5 pcs)",
+      "description": "Handmade dumplings stuffed with seasoned pork, scallions, and cabbage, served with chili ponzu dipping sauce.",
+      "price": 8.50,
+      "image": "/loaded-fries.png",
+      "category": 3,
+      "isAvailable": true
+    },
+    {
+      "id": 205,
+      "name": "Steamed Edamame with Maldon Salt",
+      "description": "Tender young soybeans in the pod dusted with flaked sea salt and sesame oil.",
+      "price": 6.00,
+      "image": "/crispy-fries.jpg",
+      "category": 3,
+      "isAvailable": true
+    }
+  ]
+}

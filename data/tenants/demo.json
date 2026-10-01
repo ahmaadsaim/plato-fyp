@@ -1,0 +1,15 @@
+{
+  "name": "demo",
+  "currency": "$ USD",
+  "cuisine": "Artisanal Pizza & Italian",
+  "phone": "+1 (555) 234-5678",
+  "address": "104 Culinary Blvd, Suite A",
+  "hours": "Mon - Sun: 11:00 AM - 10:00 PM",
+  "headline": "Handcrafted Flavors Delivered Fresh",
+  "primaryColor": "#10B981",
+  "secondaryColor": "#064E3B",
+  "textColor": "#FFFFFF",
+  "theme": "modern",
+  "slug": "demo",
+  "updatedAt": "2026-09-25T08:00:52.171Z"
+}

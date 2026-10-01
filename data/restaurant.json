@@ -1,0 +1,31 @@
+{
+  "id": "rest-plato-01",
+  "name": "Plato Artisan Kitchen",
+  "tagline": "Elevated comfort food & stone-fired delights crafted from locally sourced ingredients.",
+  "description": "At Plato Artisan Kitchen, we celebrate the honest beauty of culinary craftsmanship. From 48-hour slow-fermented pizza dough to wagyu smash patties and handmade daily pasta, every plate is prepared with obsessive attention to flavor.",
+  "logo": "🍽️",
+  "phone": "+1 (555) 382-7528",
+  "email": "hello@platokitchen.com",
+  "address": {
+    "street": "452 Culinary Boulevard, Suite 100",
+    "city": "San Francisco",
+    "state": "CA",
+    "postalCode": "94103",
+    "country": "United States"
+  },
+  "hours": {
+    "weekdays": "11:00 AM - 10:00 PM",
+    "weekends": "10:00 AM - 11:00 PM"
+  },
+  "rating": 4.9,
+  "reviewCount": 2480,
+  "deliveryTime": "25-35 min",
+  "deliveryFee": "$2.99",
+  "minimumOrder": "$15.00",
+  "currency": "$",
+  "social": {
+    "instagram": "https://instagram.com/platokitchen",
+    "facebook": "https://facebook.com/platokitchen",
+    "twitter": "https://twitter.com/platokitchen"
+  }
+}

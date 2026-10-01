@@ -1,0 +1,125 @@
+{
+  "storeId": "pizza-artisan",
+  "metadata": {
+    "name": "Artisan Crust Co.",
+    "tagline": "WOOD-FIRED PERFECTION",
+    "description": "Authentic wood-fired Neapolitan pizzas made with imported Italian flour and fresh mozzarella.",
+    "logo": "/placeholder-logo.svg",
+    "favicon": "/icon.svg",
+    "currency": {
+      "symbol": "$",
+      "code": "USD",
+      "position": "before"
+    },
+    "contact": {
+      "phone": "+1 (555) 234-5678",
+      "email": "orders@artisancrust.com",
+      "address": "456 Little Italy Way, New York, NY 10013",
+      "city": "New York",
+      "country": "USA",
+      "whatsapp": "+15552345678"
+    },
+    "openingHours": [
+      {
+        "days": "Tuesday - Sunday",
+        "hours": "11:30 AM - 11:00 PM"
+      }
+    ],
+    "socialLinks": {
+      "facebook": "https://facebook.com",
+      "instagram": "https://instagram.com"
+    },
+    "theme": {
+      "primaryColor": "#e64a19",
+      "primaryForeground": "#ffffff",
+      "accentColor": "#ff5722",
+      "borderRadius": "0.75rem"
+    },
+    "delivery": {
+      "fee": 4.99,
+      "freeDeliveryAbove": 35,
+      "estimatedTimeMin": 25,
+      "estimatedTimeMax": 40,
+      "minimumOrder": 15
+    },
+    "features": {
+      "enableCallAndOrder": true,
+      "enableBranchSelector": true,
+      "enableOrderNotes": true,
+      "enableWhatsAppOrder": true
+    }
+  },
+  "branches": [
+    {
+      "id": 1,
+      "name": "Downtown Manhattan",
+      "address": "456 Little Italy Way, New York, NY",
+      "phone": "+1 (555) 234-5678",
+      "city": "New York",
+      "isActive": true
+    },
+    {
+      "id": 2,
+      "name": "Brooklyn Heights",
+      "address": "88 Montague Street, Brooklyn, NY",
+      "phone": "+1 (555) 876-5432",
+      "city": "New York",
+      "isActive": false
+    }
+  ],
+  "heroBanners": [
+    {
+      "id": 1,
+      "image": "/hero_banner/Saint Stack Banner.svg",
+      "alt": "Artisan Pizza Banner",
+      "title": "Truffle & Burrata",
+      "subtitle": "Chef's Handcrafted Creation"
+    }
+  ],
+  "categories": [
+    {
+      "id": 1,
+      "name": "Signature Pizzas"
+    },
+    {
+      "id": 2,
+      "name": "Appetizers & Salads"
+    },
+    {
+      "id": 3,
+      "name": "Beverages & Desserts"
+    }
+  ],
+  "globalAddOns": [
+    { "name": "Extra Fresh Mozzarella", "price": 2.5 },
+    { "name": "Hot Honey Drizzle", "price": 1.5 },
+    { "name": "San Marzano Dip", "price": 2.0 }
+  ],
+  "globalMealOptions": [
+    {
+      "name": "Make it a Combo (Garlic Knots + Soda)",
+      "description": "Includes 4 warm garlic knots and choice of canned drink",
+      "price": 5.99
+    }
+  ],
+  "products": [
+    {
+      "id": 101,
+      "name": "Margherita D.O.P.",
+      "description": "San Marzano tomatoes, fresh buffalo mozzarella, basil, extra virgin olive oil",
+      "price": 16.99,
+      "image": "/classic-cheesecake.png",
+      "category": 1,
+      "isAvailable": true
+    },
+    {
+      "id": 102,
+      "name": "Spicy Diavola",
+      "description": "Calabrian salami, chili-infused organic honey, smoked provolone, fresh oregano",
+      "price": 19.5,
+      "image": "/spicy-chicken-burger.png",
+      "category": 1,
+      "isAvailable": true
+    }
+  ]
+}

@@ -1,0 +1,155 @@
+{
+  "storeId": "taco-cantina",
+  "metadata": {
+    "name": "La Fiesta Taco Cantina",
+    "tagline": "STREET TACOS & SMOKED MEATS",
+    "description": "Slow-braised beef birria, spit-roasted al pastor, hand-pressed heirloom corn tortillas, and fiery fresh salsas.",
+    "logo": "/placeholder-logo.svg",
+    "favicon": "/icon.svg",
+    "currency": {
+      "symbol": "$",
+      "code": "USD",
+      "position": "before"
+    },
+    "contact": {
+      "phone": "+1 (555) 901-2345",
+      "email": "hola@lafiestatacos.com",
+      "address": "1200 S Congress Ave, Austin, TX 78704",
+      "city": "Austin",
+      "country": "USA",
+      "whatsapp": "+15559012345"
+    },
+    "openingHours": [
+      {
+        "days": "Monday - Sunday",
+        "hours": "11:00 AM - 12:00 AM"
+      }
+    ],
+    "socialLinks": {
+      "facebook": "https://facebook.com",
+      "instagram": "https://instagram.com"
+    },
+    "theme": {
+      "primaryColor": "#10b981",
+      "primaryForeground": "#ffffff",
+      "accentColor": "#059669",
+      "borderRadius": "0.75rem"
+    },
+    "delivery": {
+      "fee": 3.49,
+      "freeDeliveryAbove": 28.00,
+      "estimatedTimeMin": 20,
+      "estimatedTimeMax": 35,
+      "minimumOrder": 12.00
+    },
+    "features": {
+      "enableCallAndOrder": true,
+      "enableBranchSelector": true,
+      "enableOrderNotes": true,
+      "enableWhatsAppOrder": true
+    }
+  },
+  "branches": [
+    {
+      "id": 1,
+      "name": "South Congress Cantina",
+      "address": "1200 S Congress Ave, Austin, TX",
+      "phone": "+1 (555) 901-2345",
+      "city": "Austin",
+      "isActive": true
+    },
+    {
+      "id": 2,
+      "name": "East 6th Street",
+      "address": "1804 E 6th St, Austin, TX",
+      "phone": "+1 (555) 901-2346",
+      "city": "Austin",
+      "isActive": false
+    }
+  ],
+  "heroBanners": [
+    {
+      "id": 1,
+      "image": "/hero_banner/Holy Moly Banner.svg",
+      "alt": "Birria Taco Special",
+      "title": "Crispy Birria & Consomé",
+      "subtitle": "Dip It In Rich Broth"
+    }
+  ],
+  "categories": [
+    {
+      "id": 1,
+      "name": "Street Tacos (Trios)"
+    },
+    {
+      "id": 2,
+      "name": "Burritos & Quesadillas"
+    },
+    {
+      "id": 3,
+      "name": "Chips, Dips & Refreshers"
+    }
+  ],
+  "globalAddOns": [
+    { "name": "Cup of Warm Birria Consomé", "price": 2.50 },
+    { "name": "Fresh Chunky Guacamole", "price": 2.75 },
+    { "name": "Extra Queso Oaxaca Melt", "price": 1.50 },
+    { "name": "Roasted Habanero Salsa", "price": 0.75 }
+  ],
+  "globalMealOptions": [
+    {
+      "name": "Fiesta Combo (Charro Beans + Agua Fresca)",
+      "description": "Slow-simmered smoky pinto beans and freshly squeezed Hibiscus (Jamaica) Agua Fresca",
+      "price": 4.99
+    }
+  ],
+  "products": [
+    {
+      "id": 401,
+      "name": "Crispy Beef Birria Quesatacos (3 pcs)",
+      "description": "Braised beef chuck in spiced chili broth, griddled inside melted cheese corn tortillas with onions, cilantro, and consomé for dipping.",
+      "price": 14.25,
+      "image": "/spicy-chicken-burger.png",
+      "category": 1,
+      "badge": "Signature",
+      "isAvailable": true
+    },
+    {
+      "id": 402,
+      "name": "Al Pastor Street Tacos (3 pcs)",
+      "description": "Marinated pork roasted on vertical spit with achiote and pineapple, grilled onions, fresh salsa verde.",
+      "price": 12.50,
+      "image": "/classic-beef-burger.png",
+      "category": 1,
+      "badge": "Street Favorite",
+      "isAvailable": true
+    },
+    {
+      "id": 403,
+      "name": "Cali Monster Burrito",
+      "description": "Carne asada, crispy fries, jack cheese, guacamole, pico de gallo, and chipotle crema rolled in a giant flour tortilla.",
+      "price": 13.95,
+      "image": "/double-cheeseburger.png",
+      "category": 2,
+      "isAvailable": true
+    },
+    {
+      "id": 404,
+      "name": "Warm Tortilla Chips & Duo Salsa",
+      "description": "House-fried corn tortilla chips served with roasted tomato salsa and tangy tomatillo salsa verde.",
+      "price": 4.50,
+      "image": "/crispy-fries.jpg",
+      "category": 3,
+      "isAvailable": true
+    },
+    {
+      "id": 405,
+      "name": "Fresh Horchata (24oz)",
+      "description": "Traditional sweet rice milk flavored with Mexican cinnamon and pure vanilla bean, served over crushed ice.",
+      "price": 3.75,
+      "image": "/refreshing-cola.png",
+      "category": 3,
+      "isAvailable": true
+    }
+  ]
+}
