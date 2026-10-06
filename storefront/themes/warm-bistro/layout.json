@@ -1,0 +1,83 @@
+{
+  "themeId": "warm-bistro",
+  "templates": {
+    "home": "classic-restaurant-home",
+    "product": "restaurant-product",
+    "category": "restaurant-category"
+  },
+  "pages": {
+    "home": [
+      {
+        "id": "navbar-1",
+        "type": "navbar",
+        "settings": {
+          "showAnnouncement": true,
+          "announcementText": "🥐 Morning croissants & sourdough baked fresh from 6:00 AM daily",
+          "sticky": true,
+          "ctaText": "Order Bakery"
+        }
+      },
+      {
+        "id": "hero-1",
+        "type": "hero",
+        "settings": {
+          "badge": "Neighborhood Artisan Bakery & Bistro",
+          "title": "Stone-Milled Flours, Pure Butter & Slow Roasts",
+          "subtitle": "Warm up with our signature sourdough toasts, delicate laminated pastries, and fair-trade specialty pour-overs.",
+          "primaryButtonText": "Order Fresh Pastries",
+          "primaryButtonHref": "#menu-section",
+          "secondaryButtonText": "Coffee & Teas",
+          "secondaryButtonHref": "#categories-section",
+          "rating": 4.9,
+          "reviewCount": "1,420+ reviews",
+          "deliveryEstimate": "15-25 min delivery",
+          "image": "https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=1200&q=80"
+        }
+      },
+      {
+        "id": "categories-1",
+        "type": "categories",
+        "settings": {
+          "title": "Bakery Counter",
+          "subtitle": "Fresh from the oven every morning",
+          "layout": "cards"
+        }
+      },
+      {
+        "id": "products-1",
+        "type": "product-grid",
+        "settings": {
+          "title": "Daily Baker's Picks",
+          "subtitle": "Limited batches prepared fresh every dawn",
+          "limit": 8,
+          "columns": 4,
+          "filterCategory": "all",
+          "showFilterTabs": true
+        }
+      },
+      {
+        "id": "promo-1",
+        "type": "promo",
+        "settings": {
+          "headline": "Coffee & Pastry Morning Bundle for $8",
+          "subtext": "Pair any signature espresso beverage with a fresh butter croissant before 11:00 AM.",
+          "promoCode": "AMBERBISTRO",
+          "buttonText": "Grab Morning Bundle",
+          "expiryText": "Available Monday through Friday",
+          "bannerImage": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=80"
+        }
+      },
+      {
+        "id": "footer-1",
+        "type": "footer",
+        "settings": {
+          "copyright": "© 2025 Plato Dining Group LLC. Amber Artisan Bistro.",
+          "newsletterTitle": "Baker's Secret Recipes",
+          "newsletterSubtitle": "Weekly baking stories, roast schedules, and seasonal pastry drops.",
+          "showHours": true,
+          "showSocial": true
+        }
+      }
+    ]
+  }
+}

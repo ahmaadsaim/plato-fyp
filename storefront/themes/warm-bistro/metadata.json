@@ -1,0 +1,7 @@
+{
+  "id": "warm-bistro",
+  "name": "Amber Artisan",
+  "description": "Warm craft bistro aesthetic with golden amber accents, stone finishes, and handcrafted charm.",
+  "tokens": "tokens.json",
+  "layout": "layout.json"
+}

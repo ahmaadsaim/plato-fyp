@@ -1,12 +1,10 @@
 import fs from "fs/promises";
 import path from "path";
-import type { StoreConfig } from "@/template/types/store";
-import defaultStoreJson from "@/template/config/default-store.json";
-import burgerCraftJson from "@/template/config/samples/burger-craft.json";
-import pizzaArtisanJson from "@/template/config/samples/pizza-artisan.json";
-import sushiSakuraJson from "@/template/config/samples/sushi-sakura.json";
-import velvetBakeryJson from "@/template/config/samples/velvet-bakery.json";
-import tacoCantinaJson from "@/template/config/samples/taco-cantina.json";
+import type { StoreConfig } from "@/storefront/types/store";
+import { sampleStores } from "@/storefront/config/sampleStores";
+import defaultStoreJson from "@/storefront/config/default-store.json";
+
+export { sampleStores } from "@/storefront/config/sampleStores";
 
 export interface TenantCustomization {
   name?: string;
@@ -28,19 +26,11 @@ export interface TenantCustomization {
   fontStyle?: "sans" | "serif" | "display" | "geometric" | string;
   animationOption?: "smooth" | "energetic" | "minimal" | string;
   theme?: string;
-  menuProducts?: any[];
-  menuCategories?: any[];
+  themeId?: string;
+  menuProducts?: import('@/storefront/types/store').Product[];
+  menuCategories?: import('@/storefront/types/store').Category[];
   updatedAt?: string;
 }
-
-export const sampleStores: Record<string, StoreConfig> = {
-  "holy-buns": defaultStoreJson as unknown as StoreConfig,
-  "burger-craft": burgerCraftJson as unknown as StoreConfig,
-  "pizza-artisan": pizzaArtisanJson as unknown as StoreConfig,
-  "sushi-sakura": sushiSakuraJson as unknown as StoreConfig,
-  "velvet-bakery": velvetBakeryJson as unknown as StoreConfig,
-  "taco-cantina": tacoCantinaJson as unknown as StoreConfig,
-};
 
 const TENANTS_DIR = path.join(process.cwd(), "data", "tenants");
 

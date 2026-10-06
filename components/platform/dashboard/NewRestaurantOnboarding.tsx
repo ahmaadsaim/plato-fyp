@@ -103,6 +103,7 @@ export function NewRestaurantOnboarding({
           user_id: "",
           name: result.tenant.name,
           slug: result.tenant.slug,
+          theme_id: "modern",
           created_at: new Date().toISOString(),
         };
 

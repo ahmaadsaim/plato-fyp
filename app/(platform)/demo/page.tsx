@@ -92,165 +92,124 @@ export default async function DemoThemesPage() {
 
             <div className="flex items-center gap-2 self-start sm:self-auto">
               <span className="px-3 py-1 rounded-lg text-xs font-semibold bg-white border border-zinc-200 text-zinc-700 shadow-2xs font-mono">
-                1 Default Theme Active
+                {themes.length} Themes Discovered
               </span>
             </div>
           </div>
         </div>
 
-        {/* Featured Default Theme Card */}
-        {defaultTheme ? (
-          <div className="bg-white rounded-2xl border border-zinc-200 overflow-hidden shadow-xs hover:border-zinc-300 transition-all">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-0">
-              {/* Left / Top: Theme Preview Image */}
-              <div className="lg:col-span-7 relative aspect-[16/10] bg-zinc-950 overflow-hidden border-b lg:border-b-0 lg:border-r border-zinc-200 group">
-                {defaultTheme.previewImage ? (
-                  <Image
-                    src={defaultTheme.previewImage}
-                    alt={defaultTheme.name}
-                    fill
-                    sizes="(max-width: 1024px) 100vw, 60vw"
-                    className="object-cover group-hover:scale-102 transition-transform duration-500"
-                    priority
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-zinc-500">
-                    Storefront Theme Preview
-                  </div>
-                )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+        {/* All Themes Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {themes.map((t) => {
+            const isModern = t.id === "modern";
+            const primaryColor = t.tokens?.colors?.primary || "#84CC16";
+            const accentColor = t.tokens?.colors?.accent || t.tokens?.colors?.secondary || "#18181B";
+            const bgColor = t.tokens?.colors?.background || "#FFFFFF";
+            const cardColor = t.tokens?.colors?.surfaceCard || t.tokens?.colors?.card || "#FFFFFF";
+            const buttonColor = t.tokens?.colors?.button || primaryColor;
 
-                {/* Overlays on Preview */}
-                <div className="absolute top-4 left-4 flex items-center gap-2">
-                  <span className="px-2.5 py-1 rounded-md text-[11px] font-bold bg-lime-500 text-black shadow-xs">
-                    DEFAULT THEME
-                  </span>
-                  <span className="px-2.5 py-1 rounded-md text-[11px] font-mono font-semibold bg-black/60 text-white backdrop-blur-md border border-white/10">
-                    v{defaultTheme.version}
-                  </span>
-                </div>
-
-                <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-white">
-                  <div>
-                    <span className="text-xs font-medium text-zinc-300 block">Active Layout</span>
-                    <span className="text-sm font-bold tracking-tight">Responsive Multi-Tenant Storefront</span>
-                  </div>
-                  <Link
-                    href={`/demo/${defaultTheme.id}`}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/90 hover:bg-white text-zinc-950 text-xs font-bold transition-colors shadow-sm"
+            return (
+              <div
+                key={t.id}
+                className="bg-white rounded-2xl border border-zinc-200 overflow-hidden shadow-xs hover:border-zinc-300 hover:shadow-sm transition-all flex flex-col justify-between"
+              >
+                <div>
+                  {/* Theme Header Bar */}
+                  <div
+                    className="h-28 relative p-4 flex flex-col justify-between overflow-hidden"
+                    style={{
+                      background: `linear-gradient(135deg, ${primaryColor} 0%, ${accentColor} 100%)`,
+                    }}
                   >
-                    <Eye className="w-3.5 h-3.5" />
-                    <span>Open Demo</span>
-                  </Link>
-                </div>
-              </div>
-
-              {/* Right: Theme Specification & Actions */}
-              <div className="lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between gap-6">
-                <div className="space-y-4">
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
-                      <h2 className="text-xl font-bold text-zinc-900 tracking-tight flex items-center gap-2">
-                        <span>{defaultTheme.name}</span>
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-lime-100 text-lime-800 border border-lime-300">
-                          Active
+                    <div className="flex items-center justify-between">
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-black/40 text-white backdrop-blur-xs font-mono">
+                        v{t.version}
+                      </span>
+                      {isModern && (
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-lime-400 text-black shadow-xs">
+                          DEFAULT
                         </span>
-                      </h2>
-                      <span className="text-xs font-mono text-zinc-400">ID: {defaultTheme.id}</span>
+                      )}
+                    </div>
+                    <div className="text-white drop-shadow-xs">
+                      <h3 className="font-extrabold text-lg leading-tight tracking-tight">
+                        {t.name}
+                      </h3>
+                      <span className="text-[11px] font-mono text-white/80">ID: {t.id}</span>
                     </div>
                   </div>
 
-                  <p className="text-xs text-zinc-600 leading-relaxed">
-                    {defaultTheme.description}
-                  </p>
+                  {/* Body Content */}
+                  <div className="p-5 space-y-4">
+                    <p className="text-xs text-zinc-600 line-clamp-2 leading-relaxed">
+                      {t.description || "A responsive, customizable storefront theme for restaurants."}
+                    </p>
 
-                  {/* Core Features */}
-                  <div className="space-y-2 pt-2 border-t border-zinc-100">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 block font-mono">
-                      Theme Customization Features
-                    </span>
-                    <ul className="space-y-1.5 text-xs text-zinc-700">
-                      <li className="flex items-center gap-2">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-lime-600 shrink-0" />
-                        <span><strong>Button & Card Colors</strong>: Custom action button & card surface backgrounds</span>
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-lime-600 shrink-0" />
-                        <span><strong>Background & Text</strong>: Dynamic body text & page background colors</span>
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-lime-600 shrink-0" />
-                        <span><strong>Primary & Secondary</strong>: Brand accents & secondary surfaces</span>
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-lime-600 shrink-0" />
-                        <span><strong>Font Styles</strong>: Modern Sans, Elegant Serif, Bold Display & Sleek Geometric</span>
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-lime-600 shrink-0" />
-                        <span><strong>Animations Option</strong>: Subtle & Smooth, Bouncy & Energetic, or Clean & Instant</span>
-                      </li>
-                    </ul>
-                  </div>
+                    {/* Color Swatches */}
+                    <div>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 block mb-1.5 font-mono">
+                        Color Tokens
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <div
+                          className="w-5 h-5 rounded-full border border-black/10 shadow-2xs"
+                          style={{ backgroundColor: primaryColor }}
+                          title={`Primary: ${primaryColor}`}
+                        />
+                        <div
+                          className="w-5 h-5 rounded-full border border-black/10 shadow-2xs"
+                          style={{ backgroundColor: accentColor }}
+                          title={`Accent: ${accentColor}`}
+                        />
+                        <div
+                          className="w-5 h-5 rounded-full border border-black/10 shadow-2xs"
+                          style={{ backgroundColor: bgColor }}
+                          title={`Background: ${bgColor}`}
+                        />
+                        <div
+                          className="w-5 h-5 rounded-full border border-black/10 shadow-2xs"
+                          style={{ backgroundColor: cardColor }}
+                          title={`Card: ${cardColor}`}
+                        />
+                        <div
+                          className="w-5 h-5 rounded-full border border-black/10 shadow-2xs"
+                          style={{ backgroundColor: buttonColor }}
+                          title={`Button: ${buttonColor}`}
+                        />
+                      </div>
+                    </div>
 
-                  {/* Swatches */}
-                  <div className="pt-2 border-t border-zinc-100">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 block mb-2 font-mono">
-                      Default Color Tokens
-                    </span>
-                    <div className="flex items-center gap-2.5">
-                      <div
-                        className="w-6 h-6 rounded-full border border-black/10 shadow-2xs"
-                        style={{ backgroundColor: defaultTheme.tokens.colors.primary }}
-                        title={`Primary: ${defaultTheme.tokens.colors.primary}`}
-                      />
-                      <div
-                        className="w-6 h-6 rounded-full border border-black/10 shadow-2xs"
-                        style={{ backgroundColor: defaultTheme.tokens.colors.accent }}
-                        title={`Accent: ${defaultTheme.tokens.colors.accent}`}
-                      />
-                      <div
-                        className="w-6 h-6 rounded-full border border-black/10 shadow-2xs"
-                        style={{ backgroundColor: defaultTheme.tokens.colors.background }}
-                        title={`Background: ${defaultTheme.tokens.colors.background}`}
-                      />
-                      <div
-                        className="w-6 h-6 rounded-full border border-black/10 shadow-2xs"
-                        style={{ backgroundColor: defaultTheme.tokens.colors.surfaceCard }}
-                        title={`Surface: ${defaultTheme.tokens.colors.surfaceCard}`}
-                      />
-                      <span className="text-[11px] text-zinc-500 font-mono ml-1">
-                        Customizable in onboarding
+                    {/* Template Mapping */}
+                    <div className="pt-2 border-t border-zinc-100 flex items-center justify-between text-[11px] text-zinc-500">
+                      <span>Template:</span>
+                      <span className="font-mono font-medium text-zinc-700 bg-zinc-100 px-2 py-0.5 rounded">
+                        {t.templates?.home || "restaurant-home"}
                       </span>
                     </div>
                   </div>
                 </div>
 
                 {/* Card Actions */}
-                <div className="pt-4 border-t border-zinc-100 flex flex-col sm:flex-row gap-2.5">
+                <div className="p-4 pt-0 border-t border-zinc-100 flex items-center gap-2">
                   <Link
-                    href={`/demo/${defaultTheme.id}`}
-                    className="flex-1 py-2.5 px-4 rounded-xl text-xs font-bold bg-lime-500 hover:bg-lime-400 text-black transition-colors flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
+                    href={`/demo/${t.id}`}
+                    className="flex-1 py-2 px-3 rounded-xl text-xs font-bold bg-lime-500 hover:bg-lime-400 text-black transition-colors flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer"
                   >
-                    <span>Inspect Live Demo</span>
-                    <ExternalLink className="w-3.5 h-3.5" />
+                    <Eye className="w-3.5 h-3.5" />
+                    <span>Live Preview</span>
                   </Link>
                   <Link
                     href="/dashboard"
-                    className="py-2.5 px-4 rounded-xl text-xs font-semibold border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-800 transition-colors flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer"
+                    className="py-2 px-3 rounded-xl text-xs font-semibold border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700 transition-colors flex items-center justify-center gap-1 shadow-2xs cursor-pointer"
+                    title="Configure in dashboard"
                   >
                     <Sliders className="w-3.5 h-3.5 text-zinc-500" />
-                    <span>Customize in Dashboard</span>
                   </Link>
                 </div>
               </div>
-            </div>
-          </div>
-        ) : (
-          <div className="bg-white rounded-2xl border border-zinc-200 p-8 text-center text-zinc-500">
-            No default theme found in registry.
-          </div>
-        )}
+            );
+          })}
+        </div>
 
         {/* Informational Architecture Card */}
         <div className="mt-8 p-5 sm:p-6 rounded-2xl border border-zinc-200 bg-white shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">

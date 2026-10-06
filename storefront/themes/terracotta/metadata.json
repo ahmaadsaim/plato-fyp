@@ -1,0 +1,7 @@
+{
+  "id": "terracotta",
+  "name": "Tuscan Rust",
+  "description": "Earthy Tuscan rust and terracotta tones with bold display typography and Mediterranean warmth.",
+  "tokens": "tokens.json",
+  "layout": "layout.json"
+}

@@ -1,0 +1,83 @@
+{
+  "themeId": "classic",
+  "templates": {
+    "home": "classic-restaurant-home",
+    "product": "restaurant-product",
+    "category": "restaurant-category"
+  },
+  "pages": {
+    "home": [
+      {
+        "id": "navbar-1",
+        "type": "navbar",
+        "settings": {
+          "showAnnouncement": true,
+          "announcementText": "🍷 Reserve your table for dinner service tonight | Curated Wine Pairings",
+          "sticky": true,
+          "ctaText": "Reserve & Order"
+        }
+      },
+      {
+        "id": "hero-1",
+        "type": "hero",
+        "settings": {
+          "badge": "Heritage Culinary Tradition • Est. 1994",
+          "title": "Rustic Italian Comfort & Artisanal Wood-Fired Fare",
+          "subtitle": "Slow-simmered sauces, hand-kneaded pastas, and seasonal farm harvests prepared under the watchful eye of our executive chefs.",
+          "primaryButtonText": "View Dinner Menu",
+          "primaryButtonHref": "#menu-section",
+          "secondaryButtonText": "Our Heritage",
+          "secondaryButtonHref": "#categories-section",
+          "rating": 4.9,
+          "reviewCount": "1,850+ reviews",
+          "deliveryEstimate": "30-40 min delivery",
+          "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80"
+        }
+      },
+      {
+        "id": "categories-1",
+        "type": "categories",
+        "settings": {
+          "title": "Antipasti, Primi & Piatti",
+          "subtitle": "Classic Italian course selections crafted from heirloom recipes",
+          "layout": "cards"
+        }
+      },
+      {
+        "id": "products-1",
+        "type": "product-grid",
+        "settings": {
+          "title": "Chef's Handcrafted Specialties",
+          "subtitle": "Signature dishes prepared fresh to order with authentic imported ingredients",
+          "limit": 8,
+          "columns": 4,
+          "filterCategory": "all",
+          "showFilterTabs": true
+        }
+      },
+      {
+        "id": "promo-1",
+        "type": "promo",
+        "settings": {
+          "headline": "Complimentary Tiramisu With Every Family Feast",
+          "subtext": "Order our Chef's Signature Tasting Board and receive house-made classic Venetian Tiramisu on the house.",
+          "promoCode": "CLASSICO",
+          "buttonText": "Apply Family Special",
+          "expiryText": "Available for dinner orders this weekend",
+          "bannerImage": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1200&q=80"
+        }
+      },
+      {
+        "id": "footer-1",
+        "type": "footer",
+        "settings": {
+          "copyright": "© 2025 Plato Dining Group LLC. Classic Artisanal Kitchen.",
+          "newsletterTitle": "Join The Sommelier's Table",
+          "newsletterSubtitle": "Receive exclusive invitations to private seasonal tastings and weekend wine pairings.",
+          "showHours": true,
+          "showSocial": true
+        }
+      }
+    ]
+  }
+}

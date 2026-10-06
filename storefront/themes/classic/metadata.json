@@ -1,0 +1,7 @@
+{
+  "id": "classic",
+  "name": "Artisanal Classic",
+  "description": "Traditional warm dining aesthetic with refined serif typography, warm ivory background, and craft amber tones.",
+  "tokens": "tokens.json",
+  "layout": "layout.json"
+}

@@ -1,0 +1,7 @@
+{
+  "id": "sushi-sakura",
+  "name": "Sakura Sushi",
+  "description": "Modern Japanese & omakase aesthetic with delicate sakura rose accents, clean lines, and premium presentation.",
+  "tokens": "tokens.json",
+  "layout": "layout.json"
+}

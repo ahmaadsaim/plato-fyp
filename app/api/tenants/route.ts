@@ -11,7 +11,7 @@ export async function GET() {
   }
 
   const tenants = await query(
-    "SELECT id, user_id, name, slug, created_at FROM tenants WHERE user_id = $1 ORDER BY created_at DESC",
+    "SELECT id, user_id, name, slug, theme_id, created_at FROM tenants WHERE user_id = $1 ORDER BY created_at DESC",
     [user.id]
   );
 
@@ -37,11 +37,18 @@ export async function POST(request: Request) {
       ? body.name.trim()
       : "";
 
+  const themeId =
+    typeof body === "object" && body !== null && "themeId" in body && typeof (body as { themeId?: unknown }).themeId === "string"
+      ? (body as { themeId: string }).themeId.trim()
+      : typeof body === "object" && body !== null && "theme" in body && typeof (body as { theme?: unknown }).theme === "string"
+      ? (body as { theme: string }).theme.trim()
+      : "modern";
+
   if (!name) {
     return NextResponse.json({ error: "Restaurant name is required" }, { status: 400 });
   }
 
-  const tenant = await createTenantForUser(user.id, name);
+  const tenant = await createTenantForUser(user.id, name, themeId);
 
   if (!tenant) {
     return NextResponse.json({ error: "Failed to create tenant" }, { status: 500 });

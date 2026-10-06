@@ -126,6 +126,7 @@ export function DashboardView({
           user_id: user.id,
           name: result.tenant.name,
           slug: result.tenant.slug,
+          theme_id: "modern",
           created_at: new Date().toISOString(),
         };
         setTenants((prev) => [newT, ...prev.filter((t) => t.id !== newT.id)]);
@@ -726,6 +727,7 @@ export function DashboardView({
             <>
               {selectedTenant ? (
                 <RestaurantDetailsView
+                  key={selectedTenant.id}
                   tenant={selectedTenant}
                   platformDomain={platformDomain}
                   platformProtocol={platformProtocol}

@@ -1,0 +1,7 @@
+{
+  "id": "burger-craft",
+  "name": "Burger Craft",
+  "description": "Gourmet smash burger styling with warm golden cheddar accents, punchy badges, and bold typography.",
+  "tokens": "tokens.json",
+  "layout": "layout.json"
+}

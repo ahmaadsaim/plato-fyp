@@ -1,0 +1,7 @@
+{
+  "id": "plato-lime",
+  "name": "Plato Lime",
+  "description": "Clean, crisp light aesthetic with Plato signature electric lime accents and modern cards.",
+  "tokens": "tokens.json",
+  "layout": "layout.json"
+}

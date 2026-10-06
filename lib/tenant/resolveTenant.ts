@@ -8,6 +8,7 @@ export interface Tenant {
   user_id: string;
   name: string;
   slug: string;
+  theme_id: string;
   created_at: string;
 }
 
@@ -44,15 +45,20 @@ export async function resolveTenant(hostOverride?: string): Promise<Tenant | nul
     return null;
   }
 
-  // Query PostgreSQL for the tenant
+  // Query PostgreSQL for the tenant including persistent theme_id
   let tenant: Tenant | null = null;
   try {
     tenant = await queryOne<Tenant>(
-      "SELECT id, user_id, name, slug, created_at FROM tenants WHERE slug = $1",
+      "SELECT id, user_id, name, slug, theme_id, created_at FROM tenants WHERE slug = $1",
       [slug.toLowerCase()]
     );
   } catch {
     tenant = null;
+  }
+
+  // Ensure theme_id always defaults to 'modern' if unset
+  if (tenant && !tenant.theme_id) {
+    tenant.theme_id = "modern";
   }
 
   // If tenant not found in DB:
@@ -67,6 +73,7 @@ export async function resolveTenant(hostOverride?: string): Promise<Tenant | nul
           .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
           .join(" "),
         slug: slug.toLowerCase(),
+        theme_id: "modern",
         created_at: new Date().toISOString(),
       };
     }

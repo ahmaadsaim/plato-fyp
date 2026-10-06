@@ -45,20 +45,19 @@ export function RestaurantDetailsView({
   const [saveSuccess, setSaveSuccess] = useState(false);
 
   useEffect(() => {
-    setName(tenant.name);
-    if (tenant?.slug) {
-      getTenantCustomizationAction(tenant.slug).then((res) => {
-        if (res.success && res.data) {
-          if (res.data.name) setName(res.data.name);
-          if (res.data.cuisine) setCuisine(res.data.cuisine);
-          if (res.data.phone) setPhone(res.data.phone);
-          if (res.data.address) setAddress(res.data.address);
-          if (res.data.hours) setHours(res.data.hours);
-          if (res.data.currency) setCurrency(res.data.currency);
-        }
-      });
-    }
-  }, [tenant?.slug, tenant.name]);
+    if (!tenant?.slug) return;
+
+    getTenantCustomizationAction(tenant.slug).then((res) => {
+      if (res.success && res.data) {
+        if (res.data.name) setName(res.data.name);
+        if (res.data.cuisine) setCuisine(res.data.cuisine);
+        if (res.data.phone) setPhone(res.data.phone);
+        if (res.data.address) setAddress(res.data.address);
+        if (res.data.hours) setHours(res.data.hours);
+        if (res.data.currency) setCurrency(res.data.currency);
+      }
+    });
+  }, [tenant?.slug]);
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();

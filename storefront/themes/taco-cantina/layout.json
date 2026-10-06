@@ -1,0 +1,83 @@
+{
+  "themeId": "taco-cantina",
+  "templates": {
+    "home": "restaurant-home",
+    "product": "restaurant-product",
+    "category": "restaurant-category"
+  },
+  "pages": {
+    "home": [
+      {
+        "id": "navbar-1",
+        "type": "navbar",
+        "settings": {
+          "showAnnouncement": true,
+          "announcementText": "🌮 Taco Tuesday: 3-Taco Combo for $10 | Handmade Corn Tortillas",
+          "sticky": true,
+          "ctaText": "Order Tacos"
+        }
+      },
+      {
+        "id": "hero-1",
+        "type": "hero",
+        "settings": {
+          "badge": "Heirloom Masa • Citrus-Marinated Asada",
+          "title": "Fiery Salsas, Slow-Braised Carnitas & Crispy Churros",
+          "subtitle": "Traditional Michoacán street tacos pressed on stone comals, loaded with fresh cilantro, diced onions, and fire-roasted habanero salsas.",
+          "primaryButtonText": "Order Street Tacos",
+          "primaryButtonHref": "#menu-section",
+          "secondaryButtonText": "Guacamole & Chips",
+          "secondaryButtonHref": "#categories-section",
+          "rating": 4.8,
+          "reviewCount": "2,100+ reviews",
+          "deliveryEstimate": "20-30 min delivery",
+          "image": "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=1200&q=80"
+        }
+      },
+      {
+        "id": "categories-1",
+        "type": "categories",
+        "settings": {
+          "title": "Cantina Favorites",
+          "subtitle": "Street Tacos, Burritos, Quesadillas & Aguas Frescas",
+          "layout": "cards"
+        }
+      },
+      {
+        "id": "products-1",
+        "type": "product-grid",
+        "settings": {
+          "title": "Taquería Specials",
+          "subtitle": "Fresh off the plancha with house-made salsas",
+          "limit": 8,
+          "columns": 4,
+          "filterCategory": "all",
+          "showFilterTabs": true
+        }
+      },
+      {
+        "id": "promo-1",
+        "type": "promo",
+        "settings": {
+          "headline": "Chips & Fresh Guacamole on the House",
+          "subtext": "Smothered in fresh lime juice, pico de gallo, and sea salt with any order over $35.",
+          "promoCode": "GUACFREE",
+          "buttonText": "Add Free Guac",
+          "expiryText": "Available for all orders this week",
+          "bannerImage": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=80"
+        }
+      },
+      {
+        "id": "footer-1",
+        "type": "footer",
+        "settings": {
+          "copyright": "© 2025 Plato Dining Group LLC. La Fiesta Taco Cantina.",
+          "newsletterTitle": "Taquería Club",
+          "newsletterSubtitle": "Weekly secret taco drops, hot salsa releases, and catering specials.",
+          "showHours": true,
+          "showSocial": true
+        }
+      }
+    ]
+  }
+}

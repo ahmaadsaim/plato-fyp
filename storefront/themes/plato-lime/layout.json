@@ -1,0 +1,83 @@
+{
+  "themeId": "plato-lime",
+  "templates": {
+    "home": "restaurant-home",
+    "product": "restaurant-product",
+    "category": "restaurant-category"
+  },
+  "pages": {
+    "home": [
+      {
+        "id": "navbar-1",
+        "type": "navbar",
+        "settings": {
+          "showAnnouncement": true,
+          "announcementText": "⚡ Fast 25-min delivery available today | Free delivery on first orders",
+          "sticky": true,
+          "ctaText": "Order Now"
+        }
+      },
+      {
+        "id": "hero-1",
+        "type": "hero",
+        "settings": {
+          "badge": "Fresh Fast Casual • Kitchen Made",
+          "title": "Flavor-Packed Bowls, Fresh Burgers & Daily Cravings",
+          "subtitle": "Discover our chef-driven menu prepared with honest ingredients, lightning-fast prep, and vibrant tastes.",
+          "primaryButtonText": "Start Your Order",
+          "primaryButtonHref": "#menu-section",
+          "secondaryButtonText": "Browse Categories",
+          "secondaryButtonHref": "#categories-section",
+          "rating": 4.9,
+          "reviewCount": "3,100+ reviews",
+          "deliveryEstimate": "20-30 min delivery",
+          "image": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=1200&q=80"
+        }
+      },
+      {
+        "id": "categories-1",
+        "type": "categories",
+        "settings": {
+          "title": "Popular Categories",
+          "subtitle": "Tap to jump straight into your favorite cravings",
+          "layout": "cards"
+        }
+      },
+      {
+        "id": "products-1",
+        "type": "product-grid",
+        "settings": {
+          "title": "Featured Favorites",
+          "subtitle": "Our most ordered items today, hot and ready for delivery",
+          "limit": 8,
+          "columns": 4,
+          "filterCategory": "all",
+          "showFilterTabs": true
+        }
+      },
+      {
+        "id": "promo-1",
+        "type": "promo",
+        "settings": {
+          "headline": "Get $5 Off Orders Over $25",
+          "subtext": "Use code LIME5 at checkout to enjoy an instant discount on your feast.",
+          "promoCode": "LIME5",
+          "buttonText": "Redeem Promo",
+          "expiryText": "Valid this week only",
+          "bannerImage": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=80"
+        }
+      },
+      {
+        "id": "footer-1",
+        "type": "footer",
+        "settings": {
+          "copyright": "© 2025 Plato Dining Group LLC. Plato Lime.",
+          "newsletterTitle": "Stay in the loop",
+          "newsletterSubtitle": "Get weekly discount drops and secret menu updates.",
+          "showHours": true,
+          "showSocial": true
+        }
+      }
+    ]
+  }
+}

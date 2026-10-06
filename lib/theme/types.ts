@@ -1,74 +1,91 @@
 import type { ComponentType } from "react";
+import type { StoreConfig } from "@/storefront/types/store";
 
 /**
- * Design tokens defining the visual appearance of a theme.
+ * Design tokens defining the visual appearance of a theme (tokens.json).
  */
 export interface ThemeColorTokens {
   primary: string;
-  primaryHover: string;
+  primaryHover?: string;
   secondary: string;
-  secondaryHover: string;
+  secondaryHover?: string;
   background: string;
-  surface: string;
-  surfaceCard: string;
-  surfaceHover: string;
+  surface?: string;
+  surfaceCard?: string;
+  surfaceHover?: string;
+  card?: string;
   text: string;
-  mutedText: string;
-  border: string;
-  accent: string;
-  accentBg: string;
-  badge: string;
-  badgeText: string;
-  price: string;
-  [key: string]: string;
+  mutedText?: string;
+  border?: string;
+  accent?: string;
+  accentBg?: string;
+  badge?: string;
+  badgeText?: string;
+  price?: string;
+  button?: string;
+  buttonText?: string;
+  buttonHover?: string;
+  [key: string]: string | undefined;
 }
 
 export interface ThemeTypographyTokens {
   fontFamily: string;
-  headingFont: string;
-  headingWeight: string;
-  bodyWeight: string;
-  headingScale: string;
-  bodySize: string;
-  [key: string]: string;
+  headingFont?: string;
+  headingWeight?: string | number;
+  bodyWeight?: string | number;
+  headingScale?: string;
+  bodySize?: string;
+  [key: string]: string | number | undefined;
 }
 
 export interface ThemeSpacingTokens {
-  section: string;
-  container: string;
-  card: string;
-  element: string;
-  [key: string]: string;
+  section?: string;
+  container?: string;
+  card?: string;
+  element?: string;
+  cardGap?: string;
+  [key: string]: string | undefined;
 }
 
 export interface ThemeRadiusTokens {
-  small: string;
-  medium: string;
-  large: string;
-  full: string;
-  [key: string]: string;
+  button?: string;
+  card?: string;
+  input?: string;
+  small?: string;
+  medium?: string;
+  large?: string;
+  full?: string;
+  [key: string]: string | undefined;
 }
 
 export interface ThemeShadowTokens {
-  sm: string;
-  card: string;
-  floating: string;
-  [key: string]: string;
+  sm?: string;
+  card?: string;
+  floating?: string;
+  [key: string]: string | undefined;
 }
 
 export interface ThemeLayoutTokens {
-  maxWidth: string;
-  productColumns: number;
-  [key: string]: string | number;
+  maxWidth?: string;
+  productColumns?: number;
+  [key: string]: string | number | undefined;
+}
+
+export interface ThemeAnimationTokens {
+  enabled?: boolean;
+  duration?: string;
+  hover?: string;
+  [key: string]: unknown;
 }
 
 export interface ThemeTokens {
   colors: ThemeColorTokens;
   typography: ThemeTypographyTokens;
-  spacing: ThemeSpacingTokens;
-  radius: ThemeRadiusTokens;
-  shadows: ThemeShadowTokens;
-  layout: ThemeLayoutTokens;
+  spacing?: ThemeSpacingTokens;
+  radius?: ThemeRadiusTokens;
+  shadows?: ThemeShadowTokens;
+  layout?: ThemeLayoutTokens;
+  animation?: ThemeAnimationTokens;
 }
 
 export interface ThemeMetadata {
@@ -79,6 +96,35 @@ export interface ThemeMetadata {
   [key: string]: unknown;
 }
 
+/**
+ * Theme identity and file mapping definition (metadata.json).
+ */
+export interface ThemeMetadataFile {
+  id: string;
+  name: string;
+  description: string;
+  tokens: string;
+  layout: string;
+}
+
+/**
+ * Theme layout representation (layout.json).
+ */
+export interface SectionConfig<TSettings = Record<string, unknown>> {
+  id: string;
+  type: string;
+  settings?: TSettings;
+}
+
+export interface ThemeLayoutJson {
+  themeId: string;
+  templates: Record<string, string>;
+  pages: Record<string, SectionConfig[]>;
+}
+
+/**
+ * Full combined theme object.
+ */
 export interface ThemeConfig {
   id: string;
   name: string;
@@ -86,7 +132,8 @@ export interface ThemeConfig {
   description: string;
   metadata?: ThemeMetadata;
   tokens: ThemeTokens;
-  supportedSections: string[];
+  layout?: ThemeLayoutJson;
+  supportedSections?: string[];
 }
 
 export interface ThemeSummary {
@@ -97,20 +144,9 @@ export interface ThemeSummary {
   previewImage?: string;
   tags?: string[];
   tokens: ThemeTokens;
+  templates?: Record<string, string>;
 }
 
-/**
- * Section definition inside a page configuration.
- */
-export interface SectionConfig<TSettings = Record<string, unknown>> {
-  id: string;
-  type: string;
-  settings: TSettings;
-}
-
-/**
- * Page structure JSON file.
- */
 export interface PageConfig {
   page: string;
   title?: string;
@@ -163,9 +199,9 @@ export interface CategoryData {
   slug: string;
   name: string;
   description: string;
-  icon: string;
-  image: string;
-  itemCount: number;
+  icon?: string;
+  image?: string;
+  itemCount?: number;
 }
 
 export interface ProductData {
@@ -174,12 +210,12 @@ export interface ProductData {
   description: string;
   price: number;
   categoryId: string;
-  categoryName: string;
+  categoryName?: string;
   image: string;
-  featured: boolean;
-  available: boolean;
-  rating: number;
-  reviewCount: number;
+  featured?: boolean;
+  available?: boolean;
+  rating?: number;
+  reviewCount?: number;
   prepTime?: string;
   calories?: number;
   badge?: string;
@@ -191,17 +227,31 @@ export interface ProductData {
  */
 export interface SectionComponentProps<TSettings = Record<string, unknown>> {
   id: string;
-  settings: TSettings;
+  settings?: TSettings;
   theme: ThemeTokens;
   restaurant: RestaurantData;
   products: ProductData[];
   categories: CategoryData[];
+  index?: number;
 }
 
-/**
- * Registry type mapping section types to React component implementations.
- */
 export type SectionRegistry = Record<
   string,
   ComponentType<SectionComponentProps<Record<string, unknown>>>
 >;
+
+/**
+ * Top-level Storefront data passed into ThemeRenderer.
+ */
+export interface StorefrontData {
+  tenant: {
+    id: string;
+    name: string;
+    slug: string;
+  };
+  theme: ThemeConfig;
+  restaurant: RestaurantData;
+  products: ProductData[];
+  categories: CategoryData[];
+  storeConfig: StoreConfig;
+}
