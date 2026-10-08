@@ -11,7 +11,7 @@ export default async function DashboardPage() {
   let tenants: Tenant[] = [];
   try {
     tenants = await query<Tenant>(
-      "SELECT id, user_id, name, slug, created_at FROM tenants WHERE user_id = $1 ORDER BY created_at DESC",
+      "SELECT id, user_id, name, slug, theme_id, theme_source, created_at FROM tenants WHERE user_id = $1 ORDER BY created_at DESC",
       [user.id]
     );
   } catch (err) {

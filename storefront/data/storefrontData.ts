@@ -7,19 +7,11 @@ import type {
   CategoryData,
   ThemeConfig,
 } from "@/lib/theme/types";
-import { getTenantCustomization, type TenantCustomization } from "@/lib/store-config";
+import { getTenantCustomization } from "@/lib/store-config";
 import { demoRestaurant, demoProducts, demoCategories } from "@/storefront/demo/demoData";
 import type { StoreConfig, Product, Category } from "@/storefront/types/store";
 import defaultStoreJson from "@/storefront/config/default-store.json";
 
-/**
- * ONE UNIFIED STOREFRONT DATA ENTRY POINT.
- *
- * Current: Reads JSON files (data/tenants/{slug}.json, storefront/themes/{id}/tokens.json, data/products.json).
- * Future: Reads PostgreSQL tables (tenants, tenant_overrides, products, categories).
- *
- * The ThemeRenderer and Storefront do NOT care whether this data comes from JSON or PostgreSQL.
- */
 export async function getStorefrontData(
   tenantId: string,
   tenantSlug?: string,
@@ -28,28 +20,9 @@ export async function getStorefrontData(
 ): Promise<StorefrontData> {
   const slug = (tenantSlug || tenantId).toLowerCase();
 
-  // 1. Read tenant customization
-  type TenantCustomizationWithOverrides = TenantCustomization & {
-    themeId?: string;
-    overrides?: TenantThemeOverrides;
-  };
+  const custom = await getTenantCustomization(slug);
+  const selectedThemeId = themeOverride || custom?.themeId || custom?.theme || "modern";
 
-  let custom: TenantCustomizationWithOverrides | null = null;
-
-  try {
-    custom = (await getTenantCustomization(slug)) as TenantCustomizationWithOverrides | null;
-  } catch {
-    custom = null;
-  }
-
-  // 2. Resolve theme ID
-  const selectedThemeId =
-    themeOverride ||
-    custom?.themeId ||
-    custom?.theme ||
-    "modern";
-
-  // 3. Load base theme from storefront/themes/{themeId}
   let baseTheme: ThemeConfig;
   try {
     baseTheme = await loadTheme(selectedThemeId);
@@ -61,7 +34,6 @@ export async function getStorefrontData(
     baseTheme = await loadTheme("modern");
   }
 
-  // 4. Construct tenant theme overrides
   const tokenOverrides: Record<string, string> = {};
   if (custom?.primaryColor) tokenOverrides.primary = custom.primaryColor;
   if (custom?.secondaryColor) tokenOverrides.secondary = custom.secondaryColor;
@@ -86,45 +58,39 @@ export async function getStorefrontData(
 
   const layoutHomeOverrides: Record<string, unknown> = {};
   if (custom?.headline) {
-    layoutHomeOverrides.hero = {
-      title: custom.headline,
-    };
+    layoutHomeOverrides.hero = { title: custom.headline };
   }
 
+  const overrideData = custom?.layoutOverride || {};
   const overrides: TenantThemeOverrides = {
     tokens: {
       colors: {
         ...tokenOverrides,
-        ...(custom?.overrides?.tokens?.colors || {}),
+        ...((custom?.tokensOverride as Record<string, unknown> | undefined)?.colors as Record<string, string> | undefined || {}),
       },
       typography: {
         ...typographyOverrides,
-        ...(custom?.overrides?.tokens?.typography || {}),
+        ...((custom?.tokensOverride as Record<string, unknown> | undefined)?.typography as Record<string, string> | undefined || {}),
       },
-      ...(custom?.overrides?.tokens || {}),
+      ...((custom?.tokensOverride as Record<string, unknown>) || {}),
     },
     layout: {
       home: {
         ...layoutHomeOverrides,
-        ...(custom?.overrides?.layout?.home || {}),
+        ...((overrideData as Record<string, unknown>).home as Record<string, unknown> | undefined || {}),
       },
-      ...(custom?.overrides?.layout || {}),
+      ...(overrideData as Record<string, unknown>),
     },
   };
 
-  // 5. Deep merge base theme + tenant overrides
   const finalTheme = mergeTheme(baseTheme, overrides);
-
-  // 6. Business Data (Isolated from theme overrides)
   const resolvedName = custom?.name || tenantName || formatNameFromSlug(slug);
 
   const restaurant: RestaurantData = {
     id: tenantId,
     name: resolvedName,
     tagline: custom?.headline || custom?.cuisine || demoRestaurant.tagline,
-    description: custom?.cuisine
-      ? `Specializing in ${custom.cuisine} prepared fresh daily.`
-      : demoRestaurant.description,
+    description: custom?.cuisine ? `Specializing in ${custom.cuisine} prepared fresh daily.` : demoRestaurant.description,
     logo: custom?.logo || demoRestaurant.logo,
     phone: custom?.phone || demoRestaurant.phone,
     email: demoRestaurant.email,
@@ -152,7 +118,6 @@ export async function getStorefrontData(
     social: demoRestaurant.social,
   };
 
-  // Products and Categories
   const products: ProductData[] =
     custom?.menuProducts && custom.menuProducts.length > 0
       ? (custom.menuProducts as unknown as ProductData[])
@@ -163,7 +128,6 @@ export async function getStorefrontData(
       ? (custom.menuCategories as unknown as CategoryData[])
       : demoCategories;
 
-  // 7. StoreConfig compatibility bridge for cart & checkout
   const storeConfig: StoreConfig = {
     ...(defaultStoreJson as unknown as StoreConfig),
     storeId: slug,

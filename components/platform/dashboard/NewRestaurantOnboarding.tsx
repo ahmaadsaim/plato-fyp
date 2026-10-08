@@ -46,6 +46,7 @@ export function NewRestaurantOnboarding({
 
   // Form State (Always fresh for new restaurant)
   const [restaurantName, setRestaurantName] = useState("");
+  const [selectedThemeId, setSelectedThemeId] = useState("modern");
   const [currency, setCurrency] = useState("$ USD");
   const [logo, setLogo] = useState<string>("");
   const [cuisine, setCuisine] = useState("Artisanal Pizza & Italian");
@@ -89,6 +90,7 @@ export function NewRestaurantOnboarding({
 
     const formData = new FormData();
     formData.append("name", restaurantName);
+    formData.append("themeId", selectedThemeId);
 
     startTransition(async () => {
       const result = await createTenantAction(null, formData);
@@ -103,7 +105,8 @@ export function NewRestaurantOnboarding({
           user_id: "",
           name: result.tenant.name,
           slug: result.tenant.slug,
-          theme_id: "modern",
+          theme_id: selectedThemeId,
+          theme_source: "LOCAL",
           created_at: new Date().toISOString(),
         };
 
@@ -207,6 +210,25 @@ export function NewRestaurantOnboarding({
                 placeholder="e.g. Hearth & Stone Pizzeria"
                 className="w-full px-3.5 py-2.5 rounded-lg bg-zinc-50 border border-zinc-200 text-zinc-900 placeholder-zinc-400 text-xs focus:outline-none focus:border-lime-500 focus:bg-white transition-colors"
               />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-zinc-700 mb-1.5">
+                Theme / Template
+              </label>
+              <select
+                value={selectedThemeId}
+                onChange={(e) => setSelectedThemeId(e.target.value)}
+                className="w-full px-3.5 py-2.5 rounded-lg bg-zinc-50 border border-zinc-200 text-zinc-900 text-xs focus:outline-none focus:border-lime-500 focus:bg-white transition-colors"
+              >
+                <option value="modern">Modern</option>
+                <option value="burger-craft">Burger Craft</option>
+                <option value="pizza-artisan">Pizza Artisan</option>
+                <option value="plato-lime">Plato Lime</option>
+                <option value="dark-modern">Dark Modern</option>
+                <option value="warm-bistro">Warm Bistro</option>
+                <option value="terracotta">Terracotta</option>
+              </select>
             </div>
 
             <div>

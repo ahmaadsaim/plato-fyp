@@ -7,6 +7,7 @@ import { UploadCloud, Image as ImageIcon, X, ArrowLeft, Store } from "lucide-rea
 
 export function CreateRestaurantView() {
   const [name, setName] = useState("");
+  const [selectedThemeId, setSelectedThemeId] = useState("modern");
   const [logo, setLogo] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [createdTenant, setCreatedTenant] = useState<{
@@ -35,6 +36,7 @@ export function CreateRestaurantView() {
     setError(null);
     const formData = new FormData();
     formData.append("name", name);
+    formData.append("themeId", selectedThemeId);
 
     startTransition(async () => {
       const res = await createTenantAction(null, formData);
@@ -136,6 +138,27 @@ export function CreateRestaurantView() {
                 placeholder="e.g. Hearth & Stone Pizzeria"
                 className="w-full px-3.5 py-2.5 rounded-lg bg-white border border-zinc-300 text-zinc-900 placeholder-zinc-400 text-xs focus:outline-none focus:border-lime-500 focus:ring-1 focus:ring-lime-500 transition-colors"
               />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-zinc-700 mb-1.5" htmlFor="themeId">
+                Theme / Template
+              </label>
+              <select
+                id="themeId"
+                name="themeId"
+                value={selectedThemeId}
+                onChange={(e) => setSelectedThemeId(e.target.value)}
+                className="w-full px-3.5 py-2.5 rounded-lg bg-white border border-zinc-300 text-zinc-900 text-xs focus:outline-none focus:border-lime-500 focus:ring-1 focus:ring-lime-500 transition-colors"
+              >
+                <option value="modern">Modern</option>
+                <option value="burger-craft">Burger Craft</option>
+                <option value="pizza-artisan">Pizza Artisan</option>
+                <option value="plato-lime">Plato Lime</option>
+                <option value="dark-modern">Dark Modern</option>
+                <option value="warm-bistro">Warm Bistro</option>
+                <option value="terracotta">Terracotta</option>
+              </select>
             </div>
 
             {/* Logo Upload in Create View */}

@@ -164,6 +164,7 @@ export function TenantOnboardingGuide({
 
     const formData = new FormData();
     formData.append("name", restaurantName);
+    formData.append("themeId", "modern");
 
     startTransition(async () => {
       const result = await createTenantAction(null, formData);
@@ -176,6 +177,7 @@ export function TenantOnboardingGuide({
           name: result.tenant.name,
           slug: result.tenant.slug,
           theme_id: "modern",
+          theme_source: "LOCAL",
           created_at: new Date().toISOString(),
         };
 

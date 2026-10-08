@@ -9,6 +9,7 @@ export interface Tenant {
   name: string;
   slug: string;
   theme_id: string;
+  theme_source?: string;
   created_at: string;
 }
 
@@ -40,45 +41,41 @@ export async function resolveTenant(hostOverride?: string): Promise<Tenant | nul
     slug = host.trim().toLowerCase();
   }
 
-  // If no tenant subdomain, this is the platform hostname.
   if (!slug) {
     return null;
   }
 
-  // Query PostgreSQL for the tenant including persistent theme_id
   let tenant: Tenant | null = null;
   try {
     tenant = await queryOne<Tenant>(
-      "SELECT id, user_id, name, slug, theme_id, created_at FROM tenants WHERE slug = $1",
+      "SELECT id, user_id, name, slug, theme_id, theme_source, created_at FROM tenants WHERE slug = $1",
       [slug.toLowerCase()]
     );
   } catch {
     tenant = null;
   }
 
-  // Ensure theme_id always defaults to 'modern' if unset
-  if (tenant && !tenant.theme_id) {
-    tenant.theme_id = "modern";
+  if (tenant) {
+    tenant.theme_id = tenant.theme_id || "modern";
+    tenant.theme_source = tenant.theme_source || "LOCAL";
+    return tenant;
   }
 
-  // If tenant not found in DB:
-  if (!tenant) {
-    // In local development, gracefully provide a fallback tenant so subdomains work offline
-    if (process.env.NODE_ENV !== "production") {
-      return {
-        id: "demo-tenant-" + slug,
-        user_id: "demo-user",
-        name: slug
-          .split("-")
-          .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-          .join(" "),
-        slug: slug.toLowerCase(),
-        theme_id: "modern",
-        created_at: new Date().toISOString(),
-      };
-    }
-    notFound();
+  if (process.env.NODE_ENV !== "production") {
+    return {
+      id: "demo-tenant-" + slug,
+      user_id: "demo-user",
+      name: slug
+        .split("-")
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(" "),
+      slug: slug.toLowerCase(),
+      theme_id: "modern",
+      theme_source: "LOCAL",
+      created_at: new Date().toISOString(),
+    };
   }
 
-  return tenant;
+  notFound();
+  return null;
 }

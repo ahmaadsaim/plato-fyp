@@ -3,9 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
 import { getTenantUrl } from "@/lib/platform";
-import { createTenantForUser } from "@/lib/tenant/repository";
-
-// ─── Types ────────────────────────────────────────────────────────────────────
+import { createTenantForUser, getTenantBySlugForUser, normalizeThemeSource, updateTenantTheme } from "@/lib/tenant/repository";
+import { getTenantCustomization, saveTenantCustomization } from "@/lib/store-config";
 
 export interface TenantActionState {
   error?: string;
@@ -17,8 +16,6 @@ export interface TenantActionState {
     url: string;
   };
 }
-
-// ─── Actions ──────────────────────────────────────────────────────────────────
 
 type StoreMenuProduct = {
   id: string | number;
@@ -43,48 +40,34 @@ export async function createTenantAction(
 ): Promise<TenantActionState> {
   const user = await requireUser();
   const name = (formData.get("name") as string)?.trim();
-  const rawThemeId =
-    ((formData.get("themeId") || formData.get("theme")) as string)?.trim() || "modern";
+  const rawThemeId = ((formData.get("themeId") || formData.get("theme")) as string)?.trim() || "modern";
+  const rawThemeSource = ((formData.get("themeSource") as string)?.trim() || "LOCAL").toUpperCase();
 
   if (!name) {
     return { error: "Restaurant name is required." };
   }
 
-  let newTenant = null;
   try {
-    newTenant = await createTenantForUser(user.id, name, rawThemeId);
+    const newTenant = await createTenantForUser(user.id, name, rawThemeId, rawThemeSource);
+    if (!newTenant) {
+      return { error: "Failed to create restaurant. Please try again." };
+    }
+
+    revalidatePath("/dashboard");
+
+    return {
+      success: true,
+      tenant: {
+        id: newTenant.id,
+        name: newTenant.name,
+        slug: newTenant.slug,
+        url: getTenantUrl(newTenant.slug),
+      },
+    };
   } catch (err) {
     console.warn("[createTenantAction] Database write error:", (err as Error).message);
-  }
-
-  // Fallback for local development if database is offline
-  if (!newTenant && process.env.NODE_ENV !== "production") {
-    const slug = (name.toLowerCase().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-")) || "restaurant";
-    newTenant = {
-      id: "local-tenant-" + Date.now(),
-      user_id: user.id,
-      name,
-      slug,
-      theme_id: rawThemeId || "modern",
-      created_at: new Date().toISOString(),
-    };
-  }
-
-  if (!newTenant) {
     return { error: "Failed to create restaurant. Please try again." };
   }
-
-  revalidatePath("/dashboard");
-
-  return {
-    success: true,
-    tenant: {
-      id: newTenant.id,
-      name: newTenant.name,
-      slug: newTenant.slug,
-      url: getTenantUrl(newTenant.slug),
-    },
-  };
 }
 
 export async function updateTenantThemeAction(
@@ -99,11 +82,13 @@ export async function updateTenantThemeAction(
       return { success: false, error: `Invalid theme ID "${themeId}". Theme does not exist.` };
     }
 
-    const { updateTenantTheme } = await import("@/lib/tenant/repository");
-    await updateTenantTheme(slug, themeId, user.id);
+    const tenant = await getTenantBySlugForUser(slug, user.id);
+    if (!tenant) {
+      return { success: false, error: "Tenant not found or not owned by this user." };
+    }
 
-    const { saveTenantCustomization } = await import("@/lib/store-config");
-    await saveTenantCustomization(slug, { themeId, theme: themeId });
+    await updateTenantTheme(slug, themeId, user.id, normalizeThemeSource("LOCAL"));
+    await saveTenantCustomization(slug, { themeId, theme: themeId, themeSource: "LOCAL" });
 
     revalidatePath("/dashboard");
     revalidatePath("/");
@@ -137,25 +122,33 @@ export async function saveTenantCustomizationAction(
     animationOption?: string;
     theme?: string;
     themeId?: string;
+    themeSource?: string;
     menuProducts?: StoreMenuProduct[];
     menuCategories?: StoreMenuCategory[];
   }
 ) {
   try {
     const user = await requireUser();
-    const selectedTheme = data.themeId || data.theme;
+    const tenant = await getTenantBySlugForUser(slug, user.id);
+    if (!tenant) {
+      return { success: false, error: "Tenant not found or not owned by this user." };
+    }
 
+    const selectedTheme = data.themeId || data.theme || tenant.theme_id || "modern";
     if (selectedTheme) {
       const { isValidTheme } = await import("@/lib/theme/repository");
       const valid = await isValidTheme(selectedTheme);
-      if (valid) {
-        const { updateTenantTheme } = await import("@/lib/tenant/repository");
-        await updateTenantTheme(slug, selectedTheme, user.id);
+      if (!valid) {
+        return { success: false, error: `Invalid theme ID "${selectedTheme}". Theme does not exist.` };
       }
     }
 
-    const { saveTenantCustomization } = await import("@/lib/store-config");
-    await saveTenantCustomization(slug, data);
+    await saveTenantCustomization(slug, {
+      ...data,
+      themeId: selectedTheme,
+      theme: selectedTheme,
+      themeSource: normalizeThemeSource(data.themeSource || "LOCAL"),
+    });
     revalidatePath("/dashboard");
     revalidatePath("/");
     revalidatePath("/", "layout");
@@ -168,7 +161,12 @@ export async function saveTenantCustomizationAction(
 
 export async function getTenantCustomizationAction(slug: string) {
   try {
-    const { getTenantCustomization } = await import("@/lib/store-config");
+    const user = await requireUser();
+    const tenant = await getTenantBySlugForUser(slug, user.id);
+    if (!tenant) {
+      return { success: false, data: null };
+    }
+
     const data = await getTenantCustomization(slug);
     return { success: true, data };
   } catch (err) {
@@ -190,6 +188,10 @@ export async function deleteTenantAction(
   }
 
   const user = await requireUser();
+  const tenant = await getTenantBySlugForUser(slug, user.id);
+  if (!tenant) {
+    return { success: false, error: "Tenant not found or not owned by this user." };
+  }
 
   const { verifyUserPassword } = await import("@/lib/auth");
   const isPasswordValid = await verifyUserPassword(user.id, user.email, passwordAttempt.trim());
@@ -206,13 +208,6 @@ export async function deleteTenantAction(
     await deleteTenantBySlug(slug, user.id);
   } catch (err) {
     console.warn("[deleteTenantAction] DB delete warning:", err);
-  }
-
-  try {
-    const { deleteTenantCustomization } = await import("@/lib/store-config");
-    await deleteTenantCustomization(slug);
-  } catch {
-    // Ignore if not present
   }
 
   revalidatePath("/dashboard");
