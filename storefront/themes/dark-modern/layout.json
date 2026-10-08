@@ -1,0 +1,83 @@
+{
+  "themeId": "dark-modern",
+  "templates": {
+    "home": "restaurant-home",
+    "product": "restaurant-product",
+    "category": "restaurant-category"
+  },
+  "pages": {
+    "home": [
+      {
+        "id": "navbar-1",
+        "type": "navbar",
+        "settings": {
+          "showAnnouncement": true,
+          "announcementText": "🌙 Late-Night Kitchen Open Until 2:00 AM | Order Online",
+          "sticky": true,
+          "ctaText": "Order Now"
+        }
+      },
+      {
+        "id": "hero-1",
+        "type": "hero",
+        "settings": {
+          "badge": "Late Night Gourmet • Charcoal Grilled",
+          "title": "Obsidian Grills, Smoky Glazes & Craft Libations",
+          "subtitle": "Elevated midnight dining with dry-aged meats, charred bao buns, and house-infused craft elixirs.",
+          "primaryButtonText": "Explore Night Menu",
+          "primaryButtonHref": "#menu-section",
+          "secondaryButtonText": "Cocktails & Drinks",
+          "secondaryButtonHref": "#categories-section",
+          "rating": 4.9,
+          "reviewCount": "2,200+ reviews",
+          "deliveryEstimate": "25-35 min delivery",
+          "image": "https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?auto=format&fit=crop&w=1200&q=80"
+        }
+      },
+      {
+        "id": "categories-1",
+        "type": "categories",
+        "settings": {
+          "title": "Night Cravings",
+          "subtitle": "Discover our signature dark-kitchen creations",
+          "layout": "cards"
+        }
+      },
+      {
+        "id": "products-1",
+        "type": "product-grid",
+        "settings": {
+          "title": "Midnight Masterpieces",
+          "subtitle": "Fresh off the robata grill and stone pizza oven",
+          "limit": 8,
+          "columns": 4,
+          "filterCategory": "all",
+          "showFilterTabs": true
+        }
+      },
+      {
+        "id": "promo-1",
+        "type": "promo",
+        "settings": {
+          "headline": "Late Night Feast: 15% Off After 9 PM",
+          "subtext": "Savor the night with discounted delivery on all craft skewers and gourmet sliders.",
+          "promoCode": "MIDNIGHT15",
+          "buttonText": "Activate Late Night Code",
+          "expiryText": "Valid 9:00 PM – 2:00 AM daily",
+          "bannerImage": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1200&q=80"
+        }
+      },
+      {
+        "id": "footer-1",
+        "type": "footer",
+        "settings": {
+          "copyright": "© 2025 Plato Dining Group LLC. Obsidian Slate.",
+          "newsletterTitle": "Night Owl Member Perks",
+          "newsletterSubtitle": "Be the first to hear about secret tasting drops and midnight discounts.",
+          "showHours": true,
+          "showSocial": true
+        }
+      }
+    ]
+  }
+}

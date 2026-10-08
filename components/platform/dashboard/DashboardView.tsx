@@ -74,6 +74,7 @@ export function DashboardView({
   // Inline Quick Create Modal
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [nameInput, setNameInput] = useState("");
+  const [newTenantThemeId, setNewTenantThemeId] = useState("modern");
   const [createError, setCreateError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -115,6 +116,7 @@ export function DashboardView({
 
     const formData = new FormData();
     formData.append("name", nameInput);
+    formData.append("themeId", newTenantThemeId);
 
     startTransition(async () => {
       const result = await createTenantAction(null, formData);
@@ -126,6 +128,8 @@ export function DashboardView({
           user_id: user.id,
           name: result.tenant.name,
           slug: result.tenant.slug,
+          theme_id: newTenantThemeId,
+          theme_source: "LOCAL",
           created_at: new Date().toISOString(),
         };
         setTenants((prev) => [newT, ...prev.filter((t) => t.id !== newT.id)]);
@@ -726,6 +730,7 @@ export function DashboardView({
             <>
               {selectedTenant ? (
                 <RestaurantDetailsView
+                  key={selectedTenant.id}
                   tenant={selectedTenant}
                   platformDomain={platformDomain}
                   platformProtocol={platformProtocol}
@@ -793,6 +798,26 @@ export function DashboardView({
                   placeholder="e.g. Bella Roma Kitchen"
                   className="w-full px-3.5 py-2.5 rounded-lg bg-white border border-zinc-300 text-zinc-900 placeholder-zinc-400 text-xs focus:outline-none focus:border-lime-500 transition-colors"
                 />
+              </div>
+
+              <div>
+                <label htmlFor="modal-tenant-theme" className="block text-xs font-medium text-zinc-700 mb-1.5">
+                  Theme / Template
+                </label>
+                <select
+                  id="modal-tenant-theme"
+                  value={newTenantThemeId}
+                  onChange={(e) => setNewTenantThemeId(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-lg bg-white border border-zinc-300 text-zinc-900 text-xs focus:outline-none focus:border-lime-500 transition-colors"
+                >
+                  <option value="modern">Modern</option>
+                  <option value="burger-craft">Burger Craft</option>
+                  <option value="pizza-artisan">Pizza Artisan</option>
+                  <option value="plato-lime">Plato Lime</option>
+                  <option value="dark-modern">Dark Modern</option>
+                  <option value="warm-bistro">Warm Bistro</option>
+                  <option value="terracotta">Terracotta</option>
+                </select>
               </div>
 
               {nameInput.trim() && (

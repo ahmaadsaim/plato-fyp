@@ -1,0 +1,83 @@
+{
+  "themeId": "velvet-bakery",
+  "templates": {
+    "home": "restaurant-home",
+    "product": "restaurant-product",
+    "category": "restaurant-category"
+  },
+  "pages": {
+    "home": [
+      {
+        "id": "navbar-1",
+        "type": "navbar",
+        "settings": {
+          "showAnnouncement": true,
+          "announcementText": "☕ Single-origin Ethiopian Yirgacheffe roasts available by the cup & bag",
+          "sticky": true,
+          "ctaText": "Order Cafe"
+        }
+      },
+      {
+        "id": "hero-1",
+        "type": "hero",
+        "settings": {
+          "badge": "Specialty Roastery & Sourdough Pâtisserie",
+          "title": "Velvet Micro-Foams, Flaky Brioche & Pure Indulgence",
+          "subtitle": "Artisan baked goods made fresh throughout the day, complemented by small-batch roasted specialty coffees.",
+          "primaryButtonText": "Order Pastries Online",
+          "primaryButtonHref": "#menu-section",
+          "secondaryButtonText": "Coffee Roasts",
+          "secondaryButtonHref": "#categories-section",
+          "rating": 4.9,
+          "reviewCount": "1,550+ reviews",
+          "deliveryEstimate": "15-25 min delivery",
+          "image": "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=1200&q=80"
+        }
+      },
+      {
+        "id": "categories-1",
+        "type": "categories",
+        "settings": {
+          "title": "Bakery & Coffee Bar",
+          "subtitle": "Pastries, Artisan Loaves, Espresso & Cold Brews",
+          "layout": "cards"
+        }
+      },
+      {
+        "id": "products-1",
+        "type": "product-grid",
+        "settings": {
+          "title": "Chef's Pâtisserie Case",
+          "subtitle": "Delicate layers, imported French butter, and decadent chocolates",
+          "limit": 8,
+          "columns": 4,
+          "filterCategory": "all",
+          "showFilterTabs": true
+        }
+      },
+      {
+        "id": "promo-1",
+        "type": "promo",
+        "settings": {
+          "headline": "Free Specialty Cold Brew on Orders Over $30",
+          "subtext": "Steeped for 18 hours with notes of dark chocolate and stone fruit.",
+          "promoCode": "COLDBREW",
+          "buttonText": "Add Free Brew",
+          "expiryText": "Available everyday until 3:00 PM",
+          "bannerImage": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=80"
+        }
+      },
+      {
+        "id": "footer-1",
+        "type": "footer",
+        "settings": {
+          "copyright": "© 2025 Plato Dining Group LLC. Velvet Roasters & Bakery.",
+          "newsletterTitle": "Velvet Roasters Dispatch",
+          "newsletterSubtitle": "New bean arrivals, seasonal roasts, and weekend brunch specials.",
+          "showHours": true,
+          "showSocial": true
+        }
+      }
+    ]
+  }
+}

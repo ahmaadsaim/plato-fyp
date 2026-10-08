@@ -1,6 +1,7 @@
+import fs from "node:fs";
+import path from "node:path";
 import { Pool } from "pg";
 
-// Guard against Turbopack/Next.js/Node runtime bug where AggregateError receives null errors
 if (typeof globalThis.AggregateError === "function") {
   const OriginalAggregateError = globalThis.AggregateError;
   const patchedFlag = "__plato_aggregate_patched__";
@@ -26,7 +27,6 @@ export const pool =
     connectionTimeoutMillis: process.env.NODE_ENV === "production" ? 5000 : 1000,
   });
 
-// Unconditionally attach error listener to prevent uncaughtException in Node.js
 pool.on("error", () => {
   // Silence idle connection drop/refusal errors when PostgreSQL is offline
 });
@@ -34,6 +34,22 @@ pool.on("error", () => {
 if (process.env.NODE_ENV !== "production") {
   globalForDb.pgPool = pool;
 }
+
+async function ensureDatabaseSchema() {
+  if (!process.env.DATABASE_URL) {
+    return;
+  }
+
+  try {
+    const schemaPath = path.join(process.cwd(), "lib", "schema.sql");
+    const schemaSql = fs.readFileSync(schemaPath, "utf8");
+    await pool.query(schemaSql);
+  } catch {
+    // Ignore startup migration failures during local/offline development.
+  }
+}
+
+void ensureDatabaseSchema();
 
 interface InMemoryUser {
   id: string;
@@ -48,6 +64,8 @@ interface InMemoryTenant {
   user_id: string;
   name: string;
   slug: string;
+  theme_id: string;
+  theme_source: string;
   created_at: string;
 }
 
@@ -81,6 +99,8 @@ const memoryStore = globalForStore.__platoMemoryStore ?? {
       user_id: "demo-merchant-0001",
       name: "Pizza House",
       slug: "pizza-house",
+      theme_id: "modern",
+      theme_source: "LOCAL",
       created_at: new Date().toISOString(),
     },
     {
@@ -88,6 +108,8 @@ const memoryStore = globalForStore.__platoMemoryStore ?? {
       user_id: "demo-merchant-0001",
       name: "Burger Craft",
       slug: "burger-craft",
+      theme_id: "burger-craft",
+      theme_source: "LOCAL",
       created_at: new Date().toISOString(),
     },
   ],
@@ -100,19 +122,16 @@ if (process.env.NODE_ENV !== "production") {
 function executeOfflineQuery<T>(text: string, params?: unknown[]): T[] {
   const normalized = text.trim().toLowerCase();
 
-  // 1. SELECT users by email
   if (normalized.includes("from users") && normalized.includes("email = $1")) {
     const email = String(params?.[0] || "").toLowerCase();
     const user = memoryStore.users.find((u) => u.email.toLowerCase() === email);
     return user ? ([user] as unknown as T[]) : [];
   }
 
-  // 2. SELECT users by id
   if (normalized.includes("from users") && normalized.includes("id = $1")) {
     const id = String(params?.[0] || "");
     const user = memoryStore.users.find((u) => u.id === id);
     if (user) return [user] as unknown as T[];
-    // Return a dummy merchant if asking for any logged in demo user
     return [
       {
         id,
@@ -123,7 +142,6 @@ function executeOfflineQuery<T>(text: string, params?: unknown[]): T[] {
     ] as unknown as T[];
   }
 
-  // 3. INSERT INTO users
   if (normalized.startsWith("insert into users")) {
     const name = String(params?.[0] || "User");
     const email = String(params?.[1] || "user@plato.local");
@@ -139,36 +157,66 @@ function executeOfflineQuery<T>(text: string, params?: unknown[]): T[] {
     return [newUser] as unknown as T[];
   }
 
-  // 4. SELECT tenants by user_id
   if (normalized.includes("from tenants") && normalized.includes("user_id = $1")) {
     const userId = String(params?.[0] || "");
-    const list = memoryStore.tenants.filter(
-      (t) => t.user_id === userId || t.user_id === "demo-merchant-0001"
-    );
+    const list = memoryStore.tenants
+      .filter((t) => t.user_id === userId || t.user_id === "demo-merchant-0001")
+      .map((t) => ({ ...t, theme_id: t.theme_id || "modern", theme_source: t.theme_source || "LOCAL" }));
     return list as unknown as T[];
   }
 
-  // 5. SELECT tenants by slug
   if (normalized.includes("from tenants") && normalized.includes("slug = $1")) {
     const slug = String(params?.[0] || "").toLowerCase();
     const tenant = memoryStore.tenants.find((t) => t.slug === slug);
-    return tenant ? ([tenant] as unknown as T[]) : [];
+    return tenant
+      ? ([{ ...tenant, theme_id: tenant.theme_id || "modern", theme_source: tenant.theme_source || "LOCAL" }] as unknown as T[])
+      : [];
   }
 
-  // 6. INSERT INTO tenants
+  if (normalized.startsWith("update tenants set theme_id")) {
+    const theme_id = String(params?.[0] || "modern");
+    const theme_source = String(params?.[1] || "LOCAL");
+    const slug = String(params?.[2] || "").toLowerCase();
+    const tenant = memoryStore.tenants.find((t) => t.slug === slug);
+    if (tenant) {
+      tenant.theme_id = theme_id;
+      tenant.theme_source = theme_source;
+      return [{ id: tenant.id, theme_id: tenant.theme_id, theme_source: tenant.theme_source }] as unknown as T[];
+    }
+    return [];
+  }
+
+  if (normalized.startsWith("delete from tenants")) {
+    const slug = String(params?.[0] || "").toLowerCase();
+    const idx = memoryStore.tenants.findIndex((t) => t.slug === slug);
+    if (idx !== -1) {
+      const removed = memoryStore.tenants.splice(idx, 1)[0];
+      return [{ id: removed.id }] as unknown as T[];
+    }
+    return [];
+  }
+
   if (normalized.startsWith("insert into tenants")) {
     const user_id = String(params?.[0] || "demo-merchant-0001");
     const name = String(params?.[1] || "My Restaurant");
     const slug = String(params?.[2] || "my-restaurant").toLowerCase();
+    const theme_id = String(params?.[3] || "modern");
+    const theme_source = String(params?.[4] || "LOCAL");
     const newTenant: InMemoryTenant = {
       id: "tenant-" + Date.now(),
       user_id,
       name,
       slug,
+      theme_id,
+      theme_source,
       created_at: new Date().toISOString(),
     };
     memoryStore.tenants.push(newTenant);
     return [newTenant] as unknown as T[];
+  }
+
+  if (normalized.includes("from theme_overrides") && normalized.includes("tenant_id = $1")) {
+    return [] as unknown as T[];
   }
 
   return [];
@@ -182,7 +230,6 @@ export async function query<T = Record<string, unknown>>(
   params?: unknown[]
 ): Promise<T[]> {
   const now = Date.now();
-  // Circuit breaker: If database connection failed recently, avoid crashing or blocking
   if (dbOffline && now - lastFailure < 60000) {
     return executeOfflineQuery<T>(text, params);
   }

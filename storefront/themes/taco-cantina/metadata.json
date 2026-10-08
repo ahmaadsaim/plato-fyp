@@ -1,0 +1,7 @@
+{
+  "id": "taco-cantina",
+  "name": "Taco Cantina",
+  "description": "Authentic street tacos and Mexican grill with lively emerald tones, punchy typography, and festive flavor.",
+  "tokens": "tokens.json",
+  "layout": "layout.json"
+}

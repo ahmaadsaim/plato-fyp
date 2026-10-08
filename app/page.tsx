@@ -1,8 +1,8 @@
 import React from "react";
 import { resolveTenant } from "@/lib/tenant";
 import { getSessionUser } from "@/lib/auth";
-import { getStoreConfigForTenant } from "@/lib/store-config";
-import { TenantWebsite } from "@/components/tenant/TenantWebsite";
+import { getStorefrontData } from "@/storefront/data/storefrontData";
+import { Storefront } from "@/storefront/Storefront";
 import { PlatformLanding } from "@/components/platform/landing/PlatformLanding";
 
 interface HomePageProps {
@@ -15,16 +15,21 @@ export const revalidate = 0;
 export default async function HomePage(props: HomePageProps) {
   const searchParams = props.searchParams ? await props.searchParams : {};
 
-  // 1. Resolve tenant from hostname or query param override
+  // 1. Resolve tenant from hostname or query param override (in dev)
   let tenant = await resolveTenant();
   if (!tenant && searchParams?.tenant) {
     tenant = await resolveTenant(searchParams.tenant);
   }
 
-  // 2. If tenant resolved, render the public tenant website using the template (NO LOGIN REQUIRED)
+  // 2. If tenant resolved, render the public tenant storefront (NO LOGIN REQUIRED)
   if (tenant) {
-    const storeConfig = await getStoreConfigForTenant(tenant.slug, tenant.name);
-    return <TenantWebsite tenant={tenant} initialConfig={storeConfig} />;
+    const storefrontData = await getStorefrontData(
+      tenant.id,
+      tenant.slug,
+      tenant.name,
+      tenant.theme_id
+    );
+    return <Storefront data={storefrontData} />;
   }
 
   // 3. Otherwise, render the platform landing page.

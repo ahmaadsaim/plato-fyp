@@ -1,0 +1,83 @@
+{
+  "themeId": "burger-craft",
+  "templates": {
+    "home": "restaurant-home",
+    "product": "restaurant-product",
+    "category": "restaurant-category"
+  },
+  "pages": {
+    "home": [
+      {
+        "id": "navbar-1",
+        "type": "navbar",
+        "settings": {
+          "showAnnouncement": true,
+          "announcementText": "🍔 Free Loaded Fries on your first smash burger order | Code: CRAFT",
+          "sticky": true,
+          "ctaText": "Order Burgers"
+        }
+      },
+      {
+        "id": "hero-1",
+        "type": "hero",
+        "settings": {
+          "badge": "Handcrafted Dry-Aged Angus Smash Burgers",
+          "title": "Crispy Edges, Melty Cheddar & Toasted Brioche",
+          "subtitle": "Pressed on searing hot flat-tops, smothered in house-churned secret sauce, and delivered hot and crispy.",
+          "primaryButtonText": "Order Smashed Now",
+          "primaryButtonHref": "#menu-section",
+          "secondaryButtonText": "View Loaded Fries",
+          "secondaryButtonHref": "#categories-section",
+          "rating": 4.9,
+          "reviewCount": "2,800+ reviews",
+          "deliveryEstimate": "20-30 min delivery",
+          "image": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=1200&q=80"
+        }
+      },
+      {
+        "id": "categories-1",
+        "type": "categories",
+        "settings": {
+          "title": "Burger Craft Menu",
+          "subtitle": "Single, Double, Triple Smash & Shakes",
+          "layout": "cards"
+        }
+      },
+      {
+        "id": "products-1",
+        "type": "product-grid",
+        "settings": {
+          "title": "Fan Favorites",
+          "subtitle": "The burgers that made us famous across town",
+          "limit": 8,
+          "columns": 4,
+          "filterCategory": "all",
+          "showFilterTabs": true
+        }
+      },
+      {
+        "id": "promo-1",
+        "type": "promo",
+        "settings": {
+          "headline": "Double Patty Upgrade Friday",
+          "subtext": "Upgrade any single smash burger to a double patty for free every Friday.",
+          "promoCode": "DOUBLEUP",
+          "buttonText": "Get Friday Double",
+          "expiryText": "Available every Friday",
+          "bannerImage": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=80"
+        }
+      },
+      {
+        "id": "footer-1",
+        "type": "footer",
+        "settings": {
+          "copyright": "© 2025 Plato Dining Group LLC. Burger Craft & Co.",
+          "newsletterTitle": "Join The Burger Syndicate",
+          "newsletterSubtitle": "Exclusive weekly smash drops, secret sauces, and VIP perks.",
+          "showHours": true,
+          "showSocial": true
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "id": "velvet-bakery",
+  "name": "Velvet Bakery",
+  "description": "Specialty coffee roasters and artisan pastry house with royal velvet tones, delicate cards, and French bakery flair.",
+  "tokens": "tokens.json",
+  "layout": "layout.json"
+}

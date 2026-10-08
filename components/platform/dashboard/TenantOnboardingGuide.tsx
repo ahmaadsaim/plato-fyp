@@ -111,8 +111,18 @@ export function TenantOnboardingGuide({
           if (res.data.cardColor) setCardColor(res.data.cardColor);
           if (res.data.backgroundColor) setBackgroundColor(res.data.backgroundColor);
           if (res.data.textColor) setTextColor(res.data.textColor);
-          if (res.data.fontStyle) setFontStyle(res.data.fontStyle as any);
-          if (res.data.animationOption) setAnimationOption(res.data.animationOption as any);
+          if (res.data.fontStyle) {
+            const nextFont = res.data.fontStyle as "sans" | "serif" | "display" | "geometric";
+            if (["sans", "serif", "display", "geometric"].includes(nextFont)) {
+              setFontStyle(nextFont);
+            }
+          }
+          if (res.data.animationOption) {
+            const nextAnimation = res.data.animationOption as "smooth" | "energetic" | "minimal";
+            if (["smooth", "energetic", "minimal"].includes(nextAnimation)) {
+              setAnimationOption(nextAnimation);
+            }
+          }
         }
       });
     }
@@ -154,6 +164,7 @@ export function TenantOnboardingGuide({
 
     const formData = new FormData();
     formData.append("name", restaurantName);
+    formData.append("themeId", "modern");
 
     startTransition(async () => {
       const result = await createTenantAction(null, formData);
@@ -165,6 +176,8 @@ export function TenantOnboardingGuide({
           user_id: "",
           name: result.tenant.name,
           slug: result.tenant.slug,
+          theme_id: "modern",
+          theme_source: "LOCAL",
           created_at: new Date().toISOString(),
         };
 
@@ -900,7 +913,9 @@ export function TenantOnboardingGuide({
                     <button
                       key={f.id}
                       type="button"
-                      onClick={() => setFontStyle(f.id as any)}
+                      onClick={() =>
+                        setFontStyle(f.id as "sans" | "serif" | "display" | "geometric")
+                      }
                       className={`p-3 rounded-xl border text-left transition-all cursor-pointer shadow-2xs ${
                         isSelected
                           ? "border-lime-500 bg-lime-50/50 ring-2 ring-lime-500/20"
@@ -965,7 +980,9 @@ export function TenantOnboardingGuide({
                     <button
                       key={a.id}
                       type="button"
-                      onClick={() => setAnimationOption(a.id as any)}
+                      onClick={() =>
+                        setAnimationOption(a.id as "smooth" | "energetic" | "minimal")
+                      }
                       className={`p-3 rounded-xl border text-left transition-all cursor-pointer shadow-2xs ${
                         isSelected
                           ? "border-lime-500 bg-lime-50/50 ring-2 ring-lime-500/20"

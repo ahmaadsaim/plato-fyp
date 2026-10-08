@@ -31,7 +31,7 @@ export interface MenuItem {
   description: string;
   price: number;
   category: string;
-  image?: string;
+  image: string;
   isAvailable?: boolean;
   badge?: string;
   dietary?: string[];
@@ -171,18 +171,24 @@ export function RestaurantMenuCustomizationView({
   const [isSaving, startTransition] = useTransition();
   const [saveSuccess, setSaveSuccess] = useState(false);
 
+  type MenuCategoryEntry = string | { id?: string | number; name?: string };
+
   // Load tenant's custom menu if saved
   useEffect(() => {
     if (tenant?.slug) {
       getTenantCustomizationAction(tenant.slug).then((res) => {
         if (res.success && res.data) {
           if (res.data.menuProducts && Array.isArray(res.data.menuProducts) && res.data.menuProducts.length > 0) {
-            setItems(res.data.menuProducts);
+            setItems(res.data.menuProducts as MenuItem[]);
           } else {
             setItems(INITIAL_PRODUCTS);
           }
           if (res.data.menuCategories && Array.isArray(res.data.menuCategories) && res.data.menuCategories.length > 0) {
-            setCategories(res.data.menuCategories.map((c: any) => (typeof c === "string" ? c : c.name)));
+            setCategories(
+              (res.data.menuCategories as MenuCategoryEntry[]).map((category) =>
+                typeof category === "string" ? category : category.name ?? "Untitled Category"
+              )
+            );
           }
         }
       });

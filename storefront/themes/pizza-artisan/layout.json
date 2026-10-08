@@ -1,0 +1,83 @@
+{
+  "themeId": "pizza-artisan",
+  "templates": {
+    "home": "restaurant-home",
+    "product": "restaurant-product",
+    "category": "restaurant-category"
+  },
+  "pages": {
+    "home": [
+      {
+        "id": "navbar-1",
+        "type": "navbar",
+        "settings": {
+          "showAnnouncement": true,
+          "announcementText": "🍕 900° Wood-Fired Neapolitan Pizza | Delivery within 30 minutes",
+          "sticky": true,
+          "ctaText": "Order Pizza"
+        }
+      },
+      {
+        "id": "hero-1",
+        "type": "hero",
+        "settings": {
+          "badge": "San Marzano D.O.P. & Imported Fior Di Latte",
+          "title": "Wood-Fired Perfection & Hand-Stretched Neapolitan Crusts",
+          "subtitle": "Blistered in our custom Italian volcanic stone oven at 900 degrees for exactly ninety seconds.",
+          "primaryButtonText": "Order Fresh Pies",
+          "primaryButtonHref": "#menu-section",
+          "secondaryButtonText": "Signature Calzones",
+          "secondaryButtonHref": "#categories-section",
+          "rating": 4.9,
+          "reviewCount": "2,600+ reviews",
+          "deliveryEstimate": "25-35 min delivery",
+          "image": "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=1200&q=80"
+        }
+      },
+      {
+        "id": "categories-1",
+        "type": "categories",
+        "settings": {
+          "title": "Pizza Artisan Categories",
+          "subtitle": "Red Sauce Pies, White Bases & Calzones",
+          "layout": "cards"
+        }
+      },
+      {
+        "id": "products-1",
+        "type": "product-grid",
+        "settings": {
+          "title": "Oven Specials",
+          "subtitle": "Our most popular wood-fired pies, blistered and sliced hot",
+          "limit": 8,
+          "columns": 4,
+          "filterCategory": "all",
+          "showFilterTabs": true
+        }
+      },
+      {
+        "id": "promo-1",
+        "type": "promo",
+        "settings": {
+          "headline": "Buy 2 Large Pies, Get Free Garlic Knots",
+          "subtext": "Smothered in herb-infused garlic butter and grated Parmigiano-Reggiano.",
+          "promoCode": "KNOTS20",
+          "buttonText": "Add Free Knots",
+          "expiryText": "Available for dinner orders",
+          "bannerImage": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=80"
+        }
+      },
+      {
+        "id": "footer-1",
+        "type": "footer",
+        "settings": {
+          "copyright": "© 2025 Plato Dining Group LLC. Artisan Crust Co.",
+          "newsletterTitle": "Pizza Lovers Club",
+          "newsletterSubtitle": "Weekly secret pie drops, truffle seasonal toppings, and dough-making guides.",
+          "showHours": true,
+          "showSocial": true
+        }
+      }
+    ]
+  }
+}

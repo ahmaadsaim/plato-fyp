@@ -1,0 +1,7 @@
+{
+  "id": "pizza-artisan",
+  "name": "Pizza Artisan",
+  "description": "Fiery wood-fired Neapolitan pizza aesthetic with blistered crusts, tomato red accents, and Italian craft flair.",
+  "tokens": "tokens.json",
+  "layout": "layout.json"
+}

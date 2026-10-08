@@ -83,6 +83,7 @@ export function RestaurantThemeCustomizationView({
   platformDomain,
   platformProtocol,
 }: RestaurantThemeCustomizationViewProps) {
+  const [selectedThemeId, setSelectedThemeId] = useState(tenant?.theme_id || "modern");
   const [headline, setHeadline] = useState("Handcrafted Flavors Delivered Fresh");
   const [primaryColor, setPrimaryColor] = useState("#84CC16");
   const [secondaryColor, setSecondaryColor] = useState("#18181B");
@@ -100,6 +101,11 @@ export function RestaurantThemeCustomizationView({
     if (tenant?.slug) {
       getTenantCustomizationAction(tenant.slug).then((res) => {
         if (res.success && res.data) {
+          if (res.data.themeId || res.data.theme) {
+            setSelectedThemeId(res.data.themeId || res.data.theme || "modern");
+          } else if (tenant?.theme_id) {
+            setSelectedThemeId(tenant.theme_id);
+          }
           if (res.data.headline) setHeadline(res.data.headline);
           if (res.data.primaryColor) setPrimaryColor(res.data.primaryColor);
           if (res.data.secondaryColor) setSecondaryColor(res.data.secondaryColor);
@@ -108,13 +114,19 @@ export function RestaurantThemeCustomizationView({
           if (res.data.cardColor) setCardColor(res.data.cardColor);
           if (res.data.backgroundColor) setBackgroundColor(res.data.backgroundColor);
           if (res.data.textColor) setTextColor(res.data.textColor);
-          if (res.data.fontStyle) setFontStyle(res.data.fontStyle as any);
+          if (res.data.fontStyle) {
+            const nextFont = res.data.fontStyle as "sans" | "serif" | "display" | "geometric";
+            if (["sans", "serif", "display", "geometric"].includes(nextFont)) {
+              setFontStyle(nextFont);
+            }
+          }
         }
       });
     }
-  }, [tenant?.slug]);
+  }, [tenant?.slug, tenant?.theme_id]);
 
   const applyPreset = (preset: typeof THEME_PRESETS[0]) => {
+    setSelectedThemeId(preset.id);
     setPrimaryColor(preset.primary);
     setSecondaryColor(preset.secondary);
     setButtonColor(preset.button);
@@ -122,7 +134,7 @@ export function RestaurantThemeCustomizationView({
     setCardColor(preset.card);
     setBackgroundColor(preset.bg);
     setTextColor(preset.text);
-    setFontStyle(preset.font as any);
+    setFontStyle(preset.font as "sans" | "serif" | "display" | "geometric");
   };
 
   const handleSave = (e: React.FormEvent) => {
@@ -139,6 +151,8 @@ export function RestaurantThemeCustomizationView({
         backgroundColor,
         textColor,
         fontStyle,
+        themeId: selectedThemeId,
+        theme: selectedThemeId,
       });
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
@@ -210,7 +224,9 @@ export function RestaurantThemeCustomizationView({
         </h3>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {THEME_PRESETS.map((p) => {
-            const isSelected = primaryColor === p.primary && backgroundColor === p.bg;
+            const isSelected =
+              selectedThemeId === p.id ||
+              (primaryColor === p.primary && backgroundColor === p.bg);
             return (
               <button
                 key={p.id}
@@ -396,7 +412,9 @@ export function RestaurantThemeCustomizationView({
                 <button
                   key={font.id}
                   type="button"
-                  onClick={() => setFontStyle(font.id as any)}
+                  onClick={() =>
+                    setFontStyle(font.id as "sans" | "serif" | "display" | "geometric")
+                  }
                   className={`p-2.5 rounded-xl border text-left transition-colors cursor-pointer ${
                     fontStyle === font.id
                       ? "border-lime-500 bg-lime-50/30"

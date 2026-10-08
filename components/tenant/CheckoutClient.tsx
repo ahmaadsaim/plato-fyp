@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, User, CreditCard, Wallet, CheckCircle2, MessageSquare } from "lucide-react";
-import type { StoreConfig, OrderCustomerInfo } from "@/template/types/store";
-import { StoreProvider, useStore } from "@/template/context/StoreContext";
+import type { StoreConfig, OrderCustomerInfo } from "@/storefront/types/store";
+import { StoreProvider, useStore } from "@/storefront/context/StoreContext";
 
 function CheckoutPageContent() {
   const router = useRouter();

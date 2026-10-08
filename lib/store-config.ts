@@ -1,12 +1,16 @@
-import fs from "fs/promises";
-import path from "path";
-import type { StoreConfig } from "@/template/types/store";
-import defaultStoreJson from "@/template/config/default-store.json";
-import burgerCraftJson from "@/template/config/samples/burger-craft.json";
-import pizzaArtisanJson from "@/template/config/samples/pizza-artisan.json";
-import sushiSakuraJson from "@/template/config/samples/sushi-sakura.json";
-import velvetBakeryJson from "@/template/config/samples/velvet-bakery.json";
-import tacoCantinaJson from "@/template/config/samples/taco-cantina.json";
+import type { StoreConfig } from "@/storefront/types/store";
+import { sampleStores } from "@/storefront/config/sampleStores";
+import defaultStoreJson from "@/storefront/config/default-store.json";
+import { query } from "@/lib/db";
+import {
+  getTenantBySlug,
+  getTenantThemeOverride,
+  normalizeThemeSource,
+  updateTenantTheme,
+  upsertTenantThemeOverride,
+} from "@/lib/tenant/repository";
+
+export { sampleStores } from "@/storefront/config/sampleStores";
 
 export interface TenantCustomization {
   name?: string;
@@ -28,78 +32,159 @@ export interface TenantCustomization {
   fontStyle?: "sans" | "serif" | "display" | "geometric" | string;
   animationOption?: "smooth" | "energetic" | "minimal" | string;
   theme?: string;
-  menuProducts?: any[];
-  menuCategories?: any[];
+  themeId?: string;
+  themeSource?: string;
+  tokensOverride?: Record<string, unknown>;
+  layoutOverride?: Record<string, unknown>;
+  menuProducts?: import('@/storefront/types/store').Product[];
+  menuCategories?: import('@/storefront/types/store').Category[];
   updatedAt?: string;
 }
 
-export const sampleStores: Record<string, StoreConfig> = {
-  "holy-buns": defaultStoreJson as unknown as StoreConfig,
-  "burger-craft": burgerCraftJson as unknown as StoreConfig,
-  "pizza-artisan": pizzaArtisanJson as unknown as StoreConfig,
-  "sushi-sakura": sushiSakuraJson as unknown as StoreConfig,
-  "velvet-bakery": velvetBakeryJson as unknown as StoreConfig,
-  "taco-cantina": tacoCantinaJson as unknown as StoreConfig,
-};
-
-const TENANTS_DIR = path.join(process.cwd(), "data", "tenants");
-
-/**
- * Ensures data/tenants directory exists
- */
-async function ensureTenantsDir(): Promise<void> {
-  try {
-    await fs.mkdir(TENANTS_DIR, { recursive: true });
-  } catch {
-    // Already exists or ignore
+function normalizeJsonObject(input: unknown): Record<string, unknown> {
+  if (input && typeof input === "object" && !Array.isArray(input)) {
+    return input as Record<string, unknown>;
   }
+
+  return {};
 }
 
-/**
- * Loads saved tenant customization from data/tenants/{slug}.json
- */
+function buildTokensOverride(data: Partial<TenantCustomization>): Record<string, unknown> {
+  const colors: Record<string, string> = {};
+  const typography: Record<string, string> = {};
+
+  if (data.primaryColor) colors.primary = data.primaryColor;
+  if (data.secondaryColor) colors.secondary = data.secondaryColor;
+  if (data.buttonColor) colors.button = data.buttonColor;
+  if (data.buttonTextColor) colors.buttonText = data.buttonTextColor;
+  if (data.cardColor) colors.card = data.cardColor;
+  if (data.backgroundColor) colors.background = data.backgroundColor;
+  if (data.textColor) colors.text = data.textColor;
+
+  if (data.fontStyle === "serif") {
+    typography.fontFamily = "Georgia, 'Playfair Display', Cambria, serif";
+    typography.headingFont = "Georgia, 'Playfair Display', Cambria, serif";
+  } else if (data.fontStyle === "display") {
+    typography.fontFamily = "'Outfit', 'Montserrat', sans-serif";
+    typography.headingFont = "'Outfit', 'Montserrat', sans-serif";
+  } else if (data.fontStyle === "geometric") {
+    typography.fontFamily = "'Plus Jakarta Sans', system-ui, sans-serif";
+    typography.headingFont = "'Plus Jakarta Sans', system-ui, sans-serif";
+  }
+
+  const payload: Record<string, unknown> = {};
+  if (Object.keys(colors).length > 0) payload.colors = colors;
+  if (Object.keys(typography).length > 0) payload.typography = typography;
+  return payload;
+}
+
+function buildLayoutOverride(data: Partial<TenantCustomization>): Record<string, unknown> {
+  const layout: Record<string, unknown> = {};
+  const hero: Record<string, unknown> = {};
+
+  if (data.headline) hero.title = data.headline;
+  if (data.cuisine) hero.subtitle = data.cuisine;
+
+  if (Object.keys(hero).length > 0) {
+    layout.home = { hero };
+  }
+
+  return layout;
+}
+
 export async function getTenantCustomization(slug: string): Promise<TenantCustomization | null> {
   try {
-    await ensureTenantsDir();
-    const filePath = path.join(TENANTS_DIR, `${slug.toLowerCase()}.json`);
-    const content = await fs.readFile(filePath, "utf-8");
-    return JSON.parse(content) as TenantCustomization;
+    const tenant = await getTenantBySlug(slug);
+    if (!tenant) return null;
+
+    const override = await getTenantThemeOverride(tenant.id);
+    const tokensOverride = normalizeJsonObject(override?.tokens_override ?? {});
+    const layoutOverride = normalizeJsonObject(override?.layout_override ?? {});
+    const colors = normalizeJsonObject(tokensOverride.colors);
+    const typography = normalizeJsonObject(tokensOverride.typography);
+
+    const homeLayout = normalizeJsonObject((layoutOverride as Record<string, unknown>).home);
+    const homeHero = normalizeJsonObject(homeLayout.hero);
+    const rootHero = normalizeJsonObject((layoutOverride as Record<string, unknown>).hero);
+
+    const headline =
+      (typeof homeHero.title === "string" ? homeHero.title : undefined) ||
+      (typeof rootHero.title === "string" ? rootHero.title : undefined);
+
+    return {
+      name: tenant.name,
+      slug: tenant.slug,
+      theme: tenant.theme_id || "modern",
+      themeId: tenant.theme_id || "modern",
+      themeSource: normalizeThemeSource((tenant as { theme_source?: string | null }).theme_source),
+      primaryColor: typeof colors.primary === "string" ? String(colors.primary) : undefined,
+      secondaryColor: typeof colors.secondary === "string" ? String(colors.secondary) : undefined,
+      buttonColor: typeof colors.button === "string" ? String(colors.button) : undefined,
+      buttonTextColor: typeof colors.buttonText === "string" ? String(colors.buttonText) : undefined,
+      cardColor: typeof colors.card === "string" ? String(colors.card) : undefined,
+      backgroundColor: typeof colors.background === "string" ? String(colors.background) : undefined,
+      textColor: typeof colors.text === "string" ? String(colors.text) : undefined,
+      fontStyle:
+        typeof typography.fontFamily === "string" && typography.fontFamily.includes("Georgia")
+          ? "serif"
+          : typeof typography.fontFamily === "string" && typography.fontFamily.includes("Outfit")
+            ? "display"
+            : typeof typography.fontFamily === "string" && typography.fontFamily.includes("Plus Jakarta")
+              ? "geometric"
+              : "sans",
+      headline,
+      cuisine:
+        (typeof homeHero.subtitle === "string" ? homeHero.subtitle : undefined) ||
+        (typeof rootHero.subtitle === "string" ? rootHero.subtitle : undefined),
+      tokensOverride,
+      layoutOverride,
+      updatedAt: override?.updated_at ?? tenant.created_at,
+    };
   } catch {
     return null;
   }
 }
 
-/**
- * Persists tenant customization to data/tenants/{slug}.json
- */
 export async function saveTenantCustomization(
   slug: string,
   data: Partial<TenantCustomization>
 ): Promise<TenantCustomization> {
-  await ensureTenantsDir();
-  const existing = (await getTenantCustomization(slug)) || {};
-  const updated: TenantCustomization = {
-    ...existing,
+  const tenant = await getTenantBySlug(slug);
+  if (!tenant) {
+    throw new Error(`Tenant "${slug}" not found.`);
+  }
+
+  const selectedThemeId = data.themeId || data.theme || tenant.theme_id || "modern";
+  const selectedThemeSource = normalizeThemeSource(data.themeSource || "LOCAL");
+
+  await updateTenantTheme(slug, selectedThemeId, tenant.user_id, selectedThemeSource);
+
+  const tokensOverride = buildTokensOverride(data);
+  const layoutOverride = buildLayoutOverride(data);
+
+  await upsertTenantThemeOverride(tenant.id, {
+    tokensOverride,
+    layoutOverride,
+  });
+
+  return {
     ...data,
-    slug: slug.toLowerCase(),
+    name: tenant.name,
+    slug: tenant.slug,
+    theme: selectedThemeId,
+    themeId: selectedThemeId,
+    themeSource: selectedThemeSource,
+    tokensOverride,
+    layoutOverride,
     updatedAt: new Date().toISOString(),
   };
-
-  const filePath = path.join(TENANTS_DIR, `${slug.toLowerCase()}.json`);
-  await fs.writeFile(filePath, JSON.stringify(updated, null, 2), "utf-8");
-  return updated;
 }
 
-/**
- * Removes saved tenant customization file
- */
 export async function deleteTenantCustomization(slug: string): Promise<void> {
-  try {
-    const filePath = path.join(TENANTS_DIR, `${slug.toLowerCase()}.json`);
-    await fs.unlink(filePath);
-  } catch {
-    // Ignore if file doesn't exist
-  }
+  const tenant = await getTenantBySlug(slug);
+  if (!tenant) return;
+
+  await query("DELETE FROM theme_overrides WHERE tenant_id = $1", [tenant.id]);
 }
 
 /**
@@ -109,21 +194,17 @@ export async function getStoreConfigForTenant(
   slug: string,
   tenantName?: string
 ): Promise<StoreConfig> {
-  // Load customizations if saved
   const custom = await getTenantCustomization(slug);
 
-  // If it's a sample store preset and no custom was saved, return preset
   if (sampleStores[slug] && !custom) {
     return sampleStores[slug];
   }
 
-  // Clone template base config (preset if exists, otherwise default)
   const baseConfig = sampleStores[slug] || defaultStoreJson;
   const config = JSON.parse(JSON.stringify(baseConfig)) as StoreConfig;
 
   config.storeId = slug;
 
-  // Custom menu categories & products
   if (custom?.menuCategories && custom.menuCategories.length > 0) {
     config.categories = custom.menuCategories;
   }
@@ -131,7 +212,6 @@ export async function getStoreConfigForTenant(
     config.products = custom.menuProducts;
   }
 
-  // 1. Restaurant Name & Tagline & Logo
   const resolvedName = custom?.name || tenantName || formatNameFromSlug(slug);
   config.metadata.name = resolvedName;
   if (custom?.logo) {
@@ -141,7 +221,6 @@ export async function getStoreConfigForTenant(
     config.metadata.tagline = custom.headline || custom.cuisine || config.metadata.tagline;
   }
 
-  // Update hero banner title & subtitle if custom headline / cuisine exists
   if (config.heroBanners && config.heroBanners.length > 0) {
     if (custom?.headline) {
       config.heroBanners[0].title = custom.headline;
@@ -151,7 +230,6 @@ export async function getStoreConfigForTenant(
     }
   }
 
-  // 2. Contact details
   if (custom?.phone) {
     config.metadata.contact.phone = custom.phone;
     config.metadata.contact.whatsapp = custom.phone.replace(/[^0-9]/g, "");
@@ -160,7 +238,6 @@ export async function getStoreConfigForTenant(
     config.metadata.contact.address = custom.address;
   }
 
-  // 3. Operating hours
   if (custom?.hours) {
     config.metadata.openingHours = [
       {
@@ -170,7 +247,6 @@ export async function getStoreConfigForTenant(
     ];
   }
 
-  // 4. Currency
   if (custom?.currency) {
     const parts = custom.currency.trim().split(" ");
     const symbol = parts[0] || "$";
@@ -178,11 +254,10 @@ export async function getStoreConfigForTenant(
     config.metadata.currency = {
       symbol,
       code,
-      position: symbol === "₨" || symbol === "Rs." ? "before" : "before",
+      position: "before",
     };
   }
 
-  // 5. Theme Palette & Visual Customization
   config.metadata.theme = {
     ...config.metadata.theme,
     name: custom?.theme || config.metadata.theme?.name || "Plato Default",
@@ -199,7 +274,6 @@ export async function getStoreConfigForTenant(
     accentColor: custom?.primaryColor || config.metadata.theme?.accentColor || "#84CC16",
   };
 
-  // 6. Branch details
   if (config.branches && config.branches.length > 0) {
     config.branches[0].name = `${resolvedName} - Main`;
     if (custom?.address) config.branches[0].address = custom.address;
@@ -216,9 +290,6 @@ function formatNameFromSlug(slug: string): string {
     .join(" ");
 }
 
-/**
- * Currency formatter
- */
 export function formatCurrency(
   amount: number,
   currency?: { symbol: string; position?: "before" | "after" }

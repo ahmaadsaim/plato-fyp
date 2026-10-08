@@ -1,0 +1,7 @@
+{
+  "id": "modern",
+  "name": "Plato Modern",
+  "description": "Contemporary high-contrast storefront with sleek dark surfaces and bold orange accents.",
+  "tokens": "tokens.json",
+  "layout": "layout.json"
+}

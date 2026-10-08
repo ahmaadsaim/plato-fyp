@@ -10,7 +10,7 @@ import type {
   CategoryData,
   SectionConfig,
 } from "@/lib/theme/types";
-import { ThemeRenderer } from "@/themes/engine/ThemeRenderer";
+import { ThemeRenderer } from "@/storefront/ThemeRenderer";
 import { mergeTheme } from "@/lib/theme/mergeTheme";
 
 interface ThemeDemoViewerProps {

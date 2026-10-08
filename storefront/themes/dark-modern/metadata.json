@@ -1,0 +1,7 @@
+{
+  "id": "dark-modern",
+  "name": "Obsidian Slate",
+  "description": "Sleek obsidian dark-mode storefront with luminous emerald accents and deep slate cards.",
+  "tokens": "tokens.json",
+  "layout": "layout.json"
+}
