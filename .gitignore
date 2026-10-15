@@ -39,3 +39,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Muaz's private project context and agent handoff (local only)
+/muaz.md
+
+# Local Neon project context
+/.neon
+
+# Private database migration backups and logs
+/.local-db-backups/

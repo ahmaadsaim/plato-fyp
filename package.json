@@ -3,13 +3,20 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "predev": "node scripts/connect-db.mjs",
     "dev": "next dev",
     "build": "next build",
+    "prestart": "node scripts/connect-db.mjs --production",
     "start": "next start",
     "lint": "eslint",
-    "db:migrate": "node scripts/migrate-db.mjs"
+    "db:migrate": "node scripts/migrate-db.mjs",
+    "db:check": "node scripts/check-db.mjs",
+    "test:db": "node --test scripts/database-regression.test.mjs"
   },
   "dependencies": {
+    "@neon/config": "^1.8.4",
+    "@neon/env": "^1.5.1",
+    "@next/env": "^16.3.5",
     "@types/bcryptjs": "^2.4.6",
     "@types/pg": "^8.23.1",
     "bcryptjs": "^3.0.3",

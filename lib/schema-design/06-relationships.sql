@@ -1,0 +1,792 @@
+-- Relationships are added after every draft module exists, including conditional modules.
+SET search_path = plato_draft, public;
+ALTER TABLE plato_draft.tenants ADD CONSTRAINT fk_tenants_user_id
+  FOREIGN KEY (user_id) REFERENCES plato_draft.users (id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_tenants_user_id_idx ON plato_draft.tenants (user_id);
+ALTER TABLE plato_draft.restaurants ADD CONSTRAINT fk_restaurants_tenant
+  FOREIGN KEY (tenant_id) REFERENCES plato_draft.tenants (id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.restaurants ADD CONSTRAINT fk_restaurants_owner_user_id
+  FOREIGN KEY (owner_user_id) REFERENCES plato_draft.users (id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_restaurants_owner_user_id_idx ON plato_draft.restaurants (owner_user_id);
+ALTER TABLE plato_draft.branches ADD CONSTRAINT fk_branches_restaurant
+  FOREIGN KEY (tenant_id,restaurant_id) REFERENCES plato_draft.restaurants (tenant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.staff_memberships ADD CONSTRAINT fk_staff_memberships_restaurant
+  FOREIGN KEY (tenant_id,restaurant_id) REFERENCES plato_draft.restaurants (tenant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.staff_memberships ADD CONSTRAINT fk_staff_memberships_user_id
+  FOREIGN KEY (user_id) REFERENCES plato_draft.users (id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_staff_memberships_user_id_idx ON plato_draft.staff_memberships (user_id);
+ALTER TABLE plato_draft.staff_branch_access ADD CONSTRAINT fk_staff_branch_access_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.staff_branch_access ADD CONSTRAINT fk_staff_branch_access_membership_id
+  FOREIGN KEY (tenant_id,restaurant_id,membership_id) REFERENCES plato_draft.staff_memberships (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_staff_branch_access_membership_id_idx ON plato_draft.staff_branch_access (tenant_id,restaurant_id,membership_id);
+ALTER TABLE plato_draft.branch_operating_hours ADD CONSTRAINT fk_branch_operating_hours_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.delivery_areas ADD CONSTRAINT fk_delivery_areas_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.branch_tax_settings ADD CONSTRAINT fk_branch_tax_settings_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.customers ADD CONSTRAINT fk_customers_restaurant
+  FOREIGN KEY (tenant_id,restaurant_id) REFERENCES plato_draft.restaurants (tenant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.customers ADD CONSTRAINT fk_customers_user_id
+  FOREIGN KEY (user_id) REFERENCES plato_draft.users (id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_customers_user_id_idx ON plato_draft.customers (user_id);
+ALTER TABLE plato_draft.customer_addresses ADD CONSTRAINT fk_customer_addresses_restaurant
+  FOREIGN KEY (tenant_id,restaurant_id) REFERENCES plato_draft.restaurants (tenant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.customer_addresses ADD CONSTRAINT fk_customer_addresses_customer_id
+  FOREIGN KEY (tenant_id,restaurant_id,customer_id) REFERENCES plato_draft.customers (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_customer_addresses_customer_id_idx ON plato_draft.customer_addresses (tenant_id,restaurant_id,customer_id);
+ALTER TABLE plato_draft.menu_categories ADD CONSTRAINT fk_menu_categories_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.menu_items ADD CONSTRAINT fk_menu_items_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.menu_items ADD CONSTRAINT fk_menu_items_category_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,category_id) REFERENCES plato_draft.menu_categories (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_menu_items_category_id_idx ON plato_draft.menu_items (tenant_id,restaurant_id,branch_id,category_id);
+ALTER TABLE plato_draft.item_variants ADD CONSTRAINT fk_item_variants_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.item_variants ADD CONSTRAINT fk_item_variants_item_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,item_id) REFERENCES plato_draft.menu_items (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_item_variants_item_id_idx ON plato_draft.item_variants (tenant_id,restaurant_id,branch_id,item_id);
+ALTER TABLE plato_draft.addons ADD CONSTRAINT fk_addons_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.item_addons ADD CONSTRAINT fk_item_addons_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.item_addons ADD CONSTRAINT fk_item_addons_item_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,item_id) REFERENCES plato_draft.menu_items (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_item_addons_item_id_idx ON plato_draft.item_addons (tenant_id,restaurant_id,branch_id,item_id);
+ALTER TABLE plato_draft.item_addons ADD CONSTRAINT fk_item_addons_addon_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,addon_id) REFERENCES plato_draft.addons (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_item_addons_addon_id_idx ON plato_draft.item_addons (tenant_id,restaurant_id,branch_id,addon_id);
+ALTER TABLE plato_draft.item_stock ADD CONSTRAINT fk_item_stock_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.item_stock ADD CONSTRAINT fk_item_stock_item_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,item_id) REFERENCES plato_draft.menu_items (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_item_stock_item_id_idx ON plato_draft.item_stock (tenant_id,restaurant_id,branch_id,item_id);
+ALTER TABLE plato_draft.item_stock ADD CONSTRAINT fk_item_stock_variant_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,variant_id) REFERENCES plato_draft.item_variants (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_item_stock_variant_id_idx ON plato_draft.item_stock (tenant_id,restaurant_id,branch_id,variant_id);
+ALTER TABLE plato_draft.item_stock_movements ADD CONSTRAINT fk_item_stock_movements_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.item_stock_movements ADD CONSTRAINT fk_item_stock_movements_stock_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,stock_id) REFERENCES plato_draft.item_stock (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_item_stock_movements_stock_id_idx ON plato_draft.item_stock_movements (tenant_id,restaurant_id,branch_id,stock_id);
+ALTER TABLE plato_draft.item_stock_movements ADD CONSTRAINT fk_item_stock_movements_order_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,order_id) REFERENCES plato_draft.orders (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_item_stock_movements_order_id_idx ON plato_draft.item_stock_movements (tenant_id,restaurant_id,branch_id,order_id);
+ALTER TABLE plato_draft.item_stock_movements ADD CONSTRAINT fk_item_stock_movements_actor_membership_id
+  FOREIGN KEY (tenant_id,restaurant_id,actor_membership_id) REFERENCES plato_draft.staff_memberships (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_item_stock_movements_actor_membership_id_idx ON plato_draft.item_stock_movements (tenant_id,restaurant_id,actor_membership_id);
+ALTER TABLE plato_draft.orders ADD CONSTRAINT fk_orders_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.orders ADD CONSTRAINT fk_orders_customer_id
+  FOREIGN KEY (tenant_id,restaurant_id,customer_id) REFERENCES plato_draft.customers (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_orders_customer_id_idx ON plato_draft.orders (tenant_id,restaurant_id,customer_id);
+ALTER TABLE plato_draft.orders ADD CONSTRAINT fk_orders_delivery_area_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,delivery_area_id) REFERENCES plato_draft.delivery_areas (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_orders_delivery_area_id_idx ON plato_draft.orders (tenant_id,restaurant_id,branch_id,delivery_area_id);
+ALTER TABLE plato_draft.orders ADD CONSTRAINT fk_orders_promotion_id
+  FOREIGN KEY (tenant_id,restaurant_id,promotion_id) REFERENCES plato_draft.promotions (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_orders_promotion_id_idx ON plato_draft.orders (tenant_id,restaurant_id,promotion_id);
+ALTER TABLE plato_draft.order_items ADD CONSTRAINT fk_order_items_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.order_items ADD CONSTRAINT fk_order_items_order_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,order_id) REFERENCES plato_draft.orders (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_order_items_order_id_idx ON plato_draft.order_items (tenant_id,restaurant_id,branch_id,order_id);
+ALTER TABLE plato_draft.order_items ADD CONSTRAINT fk_order_items_item_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,item_id) REFERENCES plato_draft.menu_items (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_order_items_item_id_idx ON plato_draft.order_items (tenant_id,restaurant_id,branch_id,item_id);
+ALTER TABLE plato_draft.order_items ADD CONSTRAINT fk_order_items_variant_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,variant_id) REFERENCES plato_draft.item_variants (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_order_items_variant_id_idx ON plato_draft.order_items (tenant_id,restaurant_id,branch_id,variant_id);
+ALTER TABLE plato_draft.order_item_addons ADD CONSTRAINT fk_order_item_addons_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.order_item_addons ADD CONSTRAINT fk_order_item_addons_order_item_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,order_item_id) REFERENCES plato_draft.order_items (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_order_item_addons_order_item_id_idx ON plato_draft.order_item_addons (tenant_id,restaurant_id,branch_id,order_item_id);
+ALTER TABLE plato_draft.order_item_addons ADD CONSTRAINT fk_order_item_addons_addon_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,addon_id) REFERENCES plato_draft.addons (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_order_item_addons_addon_id_idx ON plato_draft.order_item_addons (tenant_id,restaurant_id,branch_id,addon_id);
+ALTER TABLE plato_draft.order_status_history ADD CONSTRAINT fk_order_status_history_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.order_status_history ADD CONSTRAINT fk_order_status_history_order_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,order_id) REFERENCES plato_draft.orders (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_order_status_history_order_id_idx ON plato_draft.order_status_history (tenant_id,restaurant_id,branch_id,order_id);
+ALTER TABLE plato_draft.order_status_history ADD CONSTRAINT fk_order_status_history_actor_membership_id
+  FOREIGN KEY (tenant_id,restaurant_id,actor_membership_id) REFERENCES plato_draft.staff_memberships (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_order_status_history_actor_membership_id_idx ON plato_draft.order_status_history (tenant_id,restaurant_id,actor_membership_id);
+ALTER TABLE plato_draft.payments ADD CONSTRAINT fk_payments_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.payments ADD CONSTRAINT fk_payments_order_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,order_id) REFERENCES plato_draft.orders (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_payments_order_id_idx ON plato_draft.payments (tenant_id,restaurant_id,branch_id,order_id);
+ALTER TABLE plato_draft.payment_events ADD CONSTRAINT fk_payment_events_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.payment_events ADD CONSTRAINT fk_payment_events_payment_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,payment_id) REFERENCES plato_draft.payments (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_payment_events_payment_id_idx ON plato_draft.payment_events (tenant_id,restaurant_id,branch_id,payment_id);
+ALTER TABLE plato_draft.refunds ADD CONSTRAINT fk_refunds_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.refunds ADD CONSTRAINT fk_refunds_payment_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,payment_id) REFERENCES plato_draft.payments (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_refunds_payment_id_idx ON plato_draft.refunds (tenant_id,restaurant_id,branch_id,payment_id);
+ALTER TABLE plato_draft.refunds ADD CONSTRAINT fk_refunds_requested_by_membership_id
+  FOREIGN KEY (tenant_id,restaurant_id,requested_by_membership_id) REFERENCES plato_draft.staff_memberships (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_refunds_requested_by_membership_id_idx ON plato_draft.refunds (tenant_id,restaurant_id,requested_by_membership_id);
+ALTER TABLE plato_draft.refunds ADD CONSTRAINT fk_refunds_requested_by_owner_user_id
+  FOREIGN KEY (requested_by_owner_user_id) REFERENCES plato_draft.users (id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_refunds_requested_by_owner_user_id_idx ON plato_draft.refunds (requested_by_owner_user_id);
+ALTER TABLE plato_draft.refund_events ADD CONSTRAINT fk_refund_events_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.refund_events ADD CONSTRAINT fk_refund_events_refund_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,refund_id) REFERENCES plato_draft.refunds (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_refund_events_refund_id_idx ON plato_draft.refund_events (tenant_id,restaurant_id,branch_id,refund_id);
+ALTER TABLE plato_draft.promotions ADD CONSTRAINT fk_promotions_restaurant
+  FOREIGN KEY (tenant_id,restaurant_id) REFERENCES plato_draft.restaurants (tenant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.promotion_redemptions ADD CONSTRAINT fk_promotion_redemptions_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.promotion_redemptions ADD CONSTRAINT fk_promotion_redemptions_promotion_id
+  FOREIGN KEY (tenant_id,restaurant_id,promotion_id) REFERENCES plato_draft.promotions (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_promotion_redemptions_promotion_id_idx ON plato_draft.promotion_redemptions (tenant_id,restaurant_id,promotion_id);
+ALTER TABLE plato_draft.promotion_redemptions ADD CONSTRAINT fk_promotion_redemptions_order_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,order_id) REFERENCES plato_draft.orders (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_promotion_redemptions_order_id_idx ON plato_draft.promotion_redemptions (tenant_id,restaurant_id,branch_id,order_id);
+ALTER TABLE plato_draft.promotion_redemptions ADD CONSTRAINT fk_promotion_redemptions_customer_id
+  FOREIGN KEY (tenant_id,restaurant_id,customer_id) REFERENCES plato_draft.customers (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_promotion_redemptions_customer_id_idx ON plato_draft.promotion_redemptions (tenant_id,restaurant_id,customer_id);
+ALTER TABLE plato_draft.pos_registers ADD CONSTRAINT fk_pos_registers_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.cash_sessions ADD CONSTRAINT fk_cash_sessions_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.cash_sessions ADD CONSTRAINT fk_cash_sessions_register_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,register_id) REFERENCES plato_draft.pos_registers (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_cash_sessions_register_id_idx ON plato_draft.cash_sessions (tenant_id,restaurant_id,branch_id,register_id);
+ALTER TABLE plato_draft.cash_sessions ADD CONSTRAINT fk_cash_sessions_cashier_membership_id
+  FOREIGN KEY (tenant_id,restaurant_id,cashier_membership_id) REFERENCES plato_draft.staff_memberships (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_cash_sessions_cashier_membership_id_idx ON plato_draft.cash_sessions (tenant_id,restaurant_id,cashier_membership_id);
+ALTER TABLE plato_draft.cash_movements ADD CONSTRAINT fk_cash_movements_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.cash_movements ADD CONSTRAINT fk_cash_movements_session_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,session_id) REFERENCES plato_draft.cash_sessions (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_cash_movements_session_id_idx ON plato_draft.cash_movements (tenant_id,restaurant_id,branch_id,session_id);
+ALTER TABLE plato_draft.cash_movements ADD CONSTRAINT fk_cash_movements_payment_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,payment_id) REFERENCES plato_draft.payments (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_cash_movements_payment_id_idx ON plato_draft.cash_movements (tenant_id,restaurant_id,branch_id,payment_id);
+ALTER TABLE plato_draft.receipts ADD CONSTRAINT fk_receipts_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.receipts ADD CONSTRAINT fk_receipts_order_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,order_id) REFERENCES plato_draft.orders (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_receipts_order_id_idx ON plato_draft.receipts (tenant_id,restaurant_id,branch_id,order_id);
+ALTER TABLE plato_draft.dining_tables ADD CONSTRAINT fk_dining_tables_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.table_sessions ADD CONSTRAINT fk_table_sessions_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.table_sessions ADD CONSTRAINT fk_table_sessions_table_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,table_id) REFERENCES plato_draft.dining_tables (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_table_sessions_table_id_idx ON plato_draft.table_sessions (tenant_id,restaurant_id,branch_id,table_id);
+ALTER TABLE plato_draft.table_sessions ADD CONSTRAINT fk_table_sessions_customer_id
+  FOREIGN KEY (tenant_id,restaurant_id,customer_id) REFERENCES plato_draft.customers (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_table_sessions_customer_id_idx ON plato_draft.table_sessions (tenant_id,restaurant_id,customer_id);
+ALTER TABLE plato_draft.kitchen_stations ADD CONSTRAINT fk_kitchen_stations_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.item_kitchen_stations ADD CONSTRAINT fk_item_kitchen_stations_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.item_kitchen_stations ADD CONSTRAINT fk_item_kitchen_stations_item_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,item_id) REFERENCES plato_draft.menu_items (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_item_kitchen_stations_item_id_idx ON plato_draft.item_kitchen_stations (tenant_id,restaurant_id,branch_id,item_id);
+ALTER TABLE plato_draft.item_kitchen_stations ADD CONSTRAINT fk_item_kitchen_stations_station_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,station_id) REFERENCES plato_draft.kitchen_stations (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_item_kitchen_stations_station_id_idx ON plato_draft.item_kitchen_stations (tenant_id,restaurant_id,branch_id,station_id);
+ALTER TABLE plato_draft.kitchen_tickets ADD CONSTRAINT fk_kitchen_tickets_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.kitchen_tickets ADD CONSTRAINT fk_kitchen_tickets_order_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,order_id) REFERENCES plato_draft.orders (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_kitchen_tickets_order_id_idx ON plato_draft.kitchen_tickets (tenant_id,restaurant_id,branch_id,order_id);
+ALTER TABLE plato_draft.kitchen_tickets ADD CONSTRAINT fk_kitchen_tickets_station_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,station_id) REFERENCES plato_draft.kitchen_stations (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_kitchen_tickets_station_id_idx ON plato_draft.kitchen_tickets (tenant_id,restaurant_id,branch_id,station_id);
+ALTER TABLE plato_draft.kitchen_ticket_items ADD CONSTRAINT fk_kitchen_ticket_items_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.kitchen_ticket_items ADD CONSTRAINT fk_kitchen_ticket_items_ticket_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,ticket_id) REFERENCES plato_draft.kitchen_tickets (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_kitchen_ticket_items_ticket_id_idx ON plato_draft.kitchen_ticket_items (tenant_id,restaurant_id,branch_id,ticket_id);
+ALTER TABLE plato_draft.kitchen_ticket_items ADD CONSTRAINT fk_kitchen_ticket_items_order_item_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,order_item_id) REFERENCES plato_draft.order_items (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_kitchen_ticket_items_order_item_id_idx ON plato_draft.kitchen_ticket_items (tenant_id,restaurant_id,branch_id,order_item_id);
+ALTER TABLE plato_draft.ingredients ADD CONSTRAINT fk_ingredients_restaurant
+  FOREIGN KEY (tenant_id,restaurant_id) REFERENCES plato_draft.restaurants (tenant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.ingredient_stock ADD CONSTRAINT fk_ingredient_stock_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.ingredient_stock ADD CONSTRAINT fk_ingredient_stock_ingredient_id
+  FOREIGN KEY (tenant_id,restaurant_id,ingredient_id) REFERENCES plato_draft.ingredients (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_ingredient_stock_ingredient_id_idx ON plato_draft.ingredient_stock (tenant_id,restaurant_id,ingredient_id);
+ALTER TABLE plato_draft.recipes ADD CONSTRAINT fk_recipes_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.recipes ADD CONSTRAINT fk_recipes_item_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,item_id) REFERENCES plato_draft.menu_items (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_recipes_item_id_idx ON plato_draft.recipes (tenant_id,restaurant_id,branch_id,item_id);
+ALTER TABLE plato_draft.recipes ADD CONSTRAINT fk_recipes_variant_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,variant_id) REFERENCES plato_draft.item_variants (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_recipes_variant_id_idx ON plato_draft.recipes (tenant_id,restaurant_id,branch_id,variant_id);
+ALTER TABLE plato_draft.recipe_ingredients ADD CONSTRAINT fk_recipe_ingredients_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.recipe_ingredients ADD CONSTRAINT fk_recipe_ingredients_recipe_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,recipe_id) REFERENCES plato_draft.recipes (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_recipe_ingredients_recipe_id_idx ON plato_draft.recipe_ingredients (tenant_id,restaurant_id,branch_id,recipe_id);
+ALTER TABLE plato_draft.recipe_ingredients ADD CONSTRAINT fk_recipe_ingredients_ingredient_id
+  FOREIGN KEY (tenant_id,restaurant_id,ingredient_id) REFERENCES plato_draft.ingredients (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_recipe_ingredients_ingredient_id_idx ON plato_draft.recipe_ingredients (tenant_id,restaurant_id,ingredient_id);
+ALTER TABLE plato_draft.stock_movements ADD CONSTRAINT fk_stock_movements_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.stock_movements ADD CONSTRAINT fk_stock_movements_stock_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,stock_id) REFERENCES plato_draft.ingredient_stock (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_stock_movements_stock_id_idx ON plato_draft.stock_movements (tenant_id,restaurant_id,branch_id,stock_id);
+ALTER TABLE plato_draft.stock_movements ADD CONSTRAINT fk_stock_movements_order_item_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,order_item_id) REFERENCES plato_draft.order_items (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_stock_movements_order_item_id_idx ON plato_draft.stock_movements (tenant_id,restaurant_id,branch_id,order_item_id);
+ALTER TABLE plato_draft.stock_movements ADD CONSTRAINT fk_stock_movements_receipt_item_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,receipt_item_id) REFERENCES plato_draft.goods_receipt_items (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_stock_movements_receipt_item_id_idx ON plato_draft.stock_movements (tenant_id,restaurant_id,branch_id,receipt_item_id);
+ALTER TABLE plato_draft.stock_batches ADD CONSTRAINT fk_stock_batches_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.stock_batches ADD CONSTRAINT fk_stock_batches_stock_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,stock_id) REFERENCES plato_draft.ingredient_stock (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_stock_batches_stock_id_idx ON plato_draft.stock_batches (tenant_id,restaurant_id,branch_id,stock_id);
+ALTER TABLE plato_draft.waste_records ADD CONSTRAINT fk_waste_records_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.waste_records ADD CONSTRAINT fk_waste_records_stock_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,stock_id) REFERENCES plato_draft.ingredient_stock (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_waste_records_stock_id_idx ON plato_draft.waste_records (tenant_id,restaurant_id,branch_id,stock_id);
+ALTER TABLE plato_draft.waste_records ADD CONSTRAINT fk_waste_records_batch_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,batch_id) REFERENCES plato_draft.stock_batches (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_waste_records_batch_id_idx ON plato_draft.waste_records (tenant_id,restaurant_id,branch_id,batch_id);
+ALTER TABLE plato_draft.suppliers ADD CONSTRAINT fk_suppliers_restaurant
+  FOREIGN KEY (tenant_id,restaurant_id) REFERENCES plato_draft.restaurants (tenant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.purchase_orders ADD CONSTRAINT fk_purchase_orders_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.purchase_orders ADD CONSTRAINT fk_purchase_orders_supplier_id
+  FOREIGN KEY (tenant_id,restaurant_id,supplier_id) REFERENCES plato_draft.suppliers (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_purchase_orders_supplier_id_idx ON plato_draft.purchase_orders (tenant_id,restaurant_id,supplier_id);
+ALTER TABLE plato_draft.purchase_order_items ADD CONSTRAINT fk_purchase_order_items_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.purchase_order_items ADD CONSTRAINT fk_purchase_order_items_purchase_order_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,purchase_order_id) REFERENCES plato_draft.purchase_orders (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_purchase_order_items_purchase_order_id_idx ON plato_draft.purchase_order_items (tenant_id,restaurant_id,branch_id,purchase_order_id);
+ALTER TABLE plato_draft.purchase_order_items ADD CONSTRAINT fk_purchase_order_items_ingredient_id
+  FOREIGN KEY (tenant_id,restaurant_id,ingredient_id) REFERENCES plato_draft.ingredients (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_purchase_order_items_ingredient_id_idx ON plato_draft.purchase_order_items (tenant_id,restaurant_id,ingredient_id);
+ALTER TABLE plato_draft.goods_receipts ADD CONSTRAINT fk_goods_receipts_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.goods_receipts ADD CONSTRAINT fk_goods_receipts_purchase_order_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,purchase_order_id) REFERENCES plato_draft.purchase_orders (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_goods_receipts_purchase_order_id_idx ON plato_draft.goods_receipts (tenant_id,restaurant_id,branch_id,purchase_order_id);
+ALTER TABLE plato_draft.goods_receipt_items ADD CONSTRAINT fk_goods_receipt_items_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.goods_receipt_items ADD CONSTRAINT fk_goods_receipt_items_receipt_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,receipt_id) REFERENCES plato_draft.goods_receipts (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_goods_receipt_items_receipt_id_idx ON plato_draft.goods_receipt_items (tenant_id,restaurant_id,branch_id,receipt_id);
+ALTER TABLE plato_draft.goods_receipt_items ADD CONSTRAINT fk_goods_receipt_items_purchase_order_item_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,purchase_order_item_id) REFERENCES plato_draft.purchase_order_items (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_goods_receipt_items_purchase_order_item_id_idx ON plato_draft.goods_receipt_items (tenant_id,restaurant_id,branch_id,purchase_order_item_id);
+ALTER TABLE plato_draft.staff_shifts ADD CONSTRAINT fk_staff_shifts_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.staff_shifts ADD CONSTRAINT fk_staff_shifts_membership_id
+  FOREIGN KEY (tenant_id,restaurant_id,membership_id) REFERENCES plato_draft.staff_memberships (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_staff_shifts_membership_id_idx ON plato_draft.staff_shifts (tenant_id,restaurant_id,membership_id);
+ALTER TABLE plato_draft.attendance_records ADD CONSTRAINT fk_attendance_records_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.attendance_records ADD CONSTRAINT fk_attendance_records_membership_id
+  FOREIGN KEY (tenant_id,restaurant_id,membership_id) REFERENCES plato_draft.staff_memberships (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_attendance_records_membership_id_idx ON plato_draft.attendance_records (tenant_id,restaurant_id,membership_id);
+ALTER TABLE plato_draft.attendance_records ADD CONSTRAINT fk_attendance_records_shift_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,shift_id) REFERENCES plato_draft.staff_shifts (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_attendance_records_shift_id_idx ON plato_draft.attendance_records (tenant_id,restaurant_id,branch_id,shift_id);
+ALTER TABLE plato_draft.loyalty_accounts ADD CONSTRAINT fk_loyalty_accounts_restaurant
+  FOREIGN KEY (tenant_id,restaurant_id) REFERENCES plato_draft.restaurants (tenant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.loyalty_accounts ADD CONSTRAINT fk_loyalty_accounts_customer_id
+  FOREIGN KEY (tenant_id,restaurant_id,customer_id) REFERENCES plato_draft.customers (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_loyalty_accounts_customer_id_idx ON plato_draft.loyalty_accounts (tenant_id,restaurant_id,customer_id);
+ALTER TABLE plato_draft.loyalty_transactions ADD CONSTRAINT fk_loyalty_transactions_restaurant
+  FOREIGN KEY (tenant_id,restaurant_id) REFERENCES plato_draft.restaurants (tenant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.loyalty_transactions ADD CONSTRAINT fk_loyalty_transactions_account_id
+  FOREIGN KEY (tenant_id,restaurant_id,account_id) REFERENCES plato_draft.loyalty_accounts (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_loyalty_transactions_account_id_idx ON plato_draft.loyalty_transactions (tenant_id,restaurant_id,account_id);
+ALTER TABLE plato_draft.loyalty_transactions ADD CONSTRAINT fk_loyalty_transactions_order_id
+  FOREIGN KEY (tenant_id,restaurant_id,order_branch_id,order_id) REFERENCES plato_draft.orders (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_loyalty_transactions_order_id_idx ON plato_draft.loyalty_transactions (tenant_id,restaurant_id,order_branch_id,order_id);
+ALTER TABLE plato_draft.customer_segments ADD CONSTRAINT fk_customer_segments_restaurant
+  FOREIGN KEY (tenant_id,restaurant_id) REFERENCES plato_draft.restaurants (tenant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.customer_segment_members ADD CONSTRAINT fk_customer_segment_members_restaurant
+  FOREIGN KEY (tenant_id,restaurant_id) REFERENCES plato_draft.restaurants (tenant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.customer_segment_members ADD CONSTRAINT fk_customer_segment_members_segment_id
+  FOREIGN KEY (tenant_id,restaurant_id,segment_id) REFERENCES plato_draft.customer_segments (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_customer_segment_members_segment_id_idx ON plato_draft.customer_segment_members (tenant_id,restaurant_id,segment_id);
+ALTER TABLE plato_draft.customer_segment_members ADD CONSTRAINT fk_customer_segment_members_customer_id
+  FOREIGN KEY (tenant_id,restaurant_id,customer_id) REFERENCES plato_draft.customers (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_customer_segment_members_customer_id_idx ON plato_draft.customer_segment_members (tenant_id,restaurant_id,customer_id);
+ALTER TABLE plato_draft.campaigns ADD CONSTRAINT fk_campaigns_restaurant
+  FOREIGN KEY (tenant_id,restaurant_id) REFERENCES plato_draft.restaurants (tenant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.campaigns ADD CONSTRAINT fk_campaigns_segment_id
+  FOREIGN KEY (tenant_id,restaurant_id,segment_id) REFERENCES plato_draft.customer_segments (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_campaigns_segment_id_idx ON plato_draft.campaigns (tenant_id,restaurant_id,segment_id);
+ALTER TABLE plato_draft.campaign_recipients ADD CONSTRAINT fk_campaign_recipients_restaurant
+  FOREIGN KEY (tenant_id,restaurant_id) REFERENCES plato_draft.restaurants (tenant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.campaign_recipients ADD CONSTRAINT fk_campaign_recipients_campaign_id
+  FOREIGN KEY (tenant_id,restaurant_id,campaign_id) REFERENCES plato_draft.campaigns (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_campaign_recipients_campaign_id_idx ON plato_draft.campaign_recipients (tenant_id,restaurant_id,campaign_id);
+ALTER TABLE plato_draft.campaign_recipients ADD CONSTRAINT fk_campaign_recipients_customer_id
+  FOREIGN KEY (tenant_id,restaurant_id,customer_id) REFERENCES plato_draft.customers (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_campaign_recipients_customer_id_idx ON plato_draft.campaign_recipients (tenant_id,restaurant_id,customer_id);
+ALTER TABLE plato_draft.forecast_runs ADD CONSTRAINT fk_forecast_runs_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.demand_forecasts ADD CONSTRAINT fk_demand_forecasts_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.demand_forecasts ADD CONSTRAINT fk_demand_forecasts_run_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,run_id) REFERENCES plato_draft.forecast_runs (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_demand_forecasts_run_id_idx ON plato_draft.demand_forecasts (tenant_id,restaurant_id,branch_id,run_id);
+ALTER TABLE plato_draft.demand_forecasts ADD CONSTRAINT fk_demand_forecasts_item_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,item_id) REFERENCES plato_draft.menu_items (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_demand_forecasts_item_id_idx ON plato_draft.demand_forecasts (tenant_id,restaurant_id,branch_id,item_id);
+ALTER TABLE plato_draft.forecast_evaluations ADD CONSTRAINT fk_forecast_evaluations_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.forecast_evaluations ADD CONSTRAINT fk_forecast_evaluations_run_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,run_id) REFERENCES plato_draft.forecast_runs (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_forecast_evaluations_run_id_idx ON plato_draft.forecast_evaluations (tenant_id,restaurant_id,branch_id,run_id);
+ALTER TABLE plato_draft.ai_recommendations ADD CONSTRAINT fk_ai_recommendations_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.ai_recommendations ADD CONSTRAINT fk_ai_recommendations_run_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,run_id) REFERENCES plato_draft.forecast_runs (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_ai_recommendations_run_id_idx ON plato_draft.ai_recommendations (tenant_id,restaurant_id,branch_id,run_id);
+ALTER TABLE plato_draft.ai_recommendations ADD CONSTRAINT fk_ai_recommendations_item_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,item_id) REFERENCES plato_draft.menu_items (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_ai_recommendations_item_id_idx ON plato_draft.ai_recommendations (tenant_id,restaurant_id,branch_id,item_id);
+ALTER TABLE plato_draft.ai_recommendations ADD CONSTRAINT fk_ai_recommendations_ingredient_id
+  FOREIGN KEY (tenant_id,restaurant_id,ingredient_id) REFERENCES plato_draft.ingredients (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_ai_recommendations_ingredient_id_idx ON plato_draft.ai_recommendations (tenant_id,restaurant_id,ingredient_id);
+ALTER TABLE plato_draft.recommendation_decisions ADD CONSTRAINT fk_recommendation_decisions_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.recommendation_decisions ADD CONSTRAINT fk_recommendation_decisions_recommendation_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,recommendation_id) REFERENCES plato_draft.ai_recommendations (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_recommendation_decisions_recommendation_id_idx ON plato_draft.recommendation_decisions (tenant_id,restaurant_id,branch_id,recommendation_id);
+ALTER TABLE plato_draft.recommendation_decisions ADD CONSTRAINT fk_recommendation_decisions_manager_membership_id
+  FOREIGN KEY (tenant_id,restaurant_id,manager_membership_id) REFERENCES plato_draft.staff_memberships (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_recommendation_decisions_manager_membership_id_idx ON plato_draft.recommendation_decisions (tenant_id,restaurant_id,manager_membership_id);
+ALTER TABLE plato_draft.recommendation_decisions ADD CONSTRAINT fk_recommendation_decisions_owner_user_id
+  FOREIGN KEY (owner_user_id) REFERENCES plato_draft.users (id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_recommendation_decisions_owner_user_id_idx ON plato_draft.recommendation_decisions (owner_user_id);
+ALTER TABLE plato_draft.plan_limits ADD CONSTRAINT fk_plan_limits_plan_id
+  FOREIGN KEY (plan_id) REFERENCES plato_draft.plans (id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_plan_limits_plan_id_idx ON plato_draft.plan_limits (plan_id);
+ALTER TABLE plato_draft.tenant_subscriptions ADD CONSTRAINT fk_tenant_subscriptions_tenant
+  FOREIGN KEY (tenant_id) REFERENCES plato_draft.tenants (id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.tenant_subscriptions ADD CONSTRAINT fk_tenant_subscriptions_plan_id
+  FOREIGN KEY (plan_id) REFERENCES plato_draft.plans (id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_tenant_subscriptions_plan_id_idx ON plato_draft.tenant_subscriptions (plan_id);
+ALTER TABLE plato_draft.tenant_usage ADD CONSTRAINT fk_tenant_usage_tenant
+  FOREIGN KEY (tenant_id) REFERENCES plato_draft.tenants (id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.sync_devices ADD CONSTRAINT fk_sync_devices_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.sync_operations ADD CONSTRAINT fk_sync_operations_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.sync_operations ADD CONSTRAINT fk_sync_operations_device_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,device_id) REFERENCES plato_draft.sync_devices (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_sync_operations_device_id_idx ON plato_draft.sync_operations (tenant_id,restaurant_id,branch_id,device_id);
+ALTER TABLE plato_draft.sync_conflicts ADD CONSTRAINT fk_sync_conflicts_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.sync_conflicts ADD CONSTRAINT fk_sync_conflicts_operation_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,operation_id) REFERENCES plato_draft.sync_operations (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_sync_conflicts_operation_id_idx ON plato_draft.sync_conflicts (tenant_id,restaurant_id,branch_id,operation_id);
+ALTER TABLE plato_draft.sync_conflicts ADD CONSTRAINT fk_sync_conflicts_resolved_by_membership_id
+  FOREIGN KEY (tenant_id,restaurant_id,resolved_by_membership_id) REFERENCES plato_draft.staff_memberships (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_sync_conflicts_resolved_by_membership_id_idx ON plato_draft.sync_conflicts (tenant_id,restaurant_id,resolved_by_membership_id);
+ALTER TABLE plato_draft.integration_connections ADD CONSTRAINT fk_integration_connections_restaurant
+  FOREIGN KEY (tenant_id,restaurant_id) REFERENCES plato_draft.restaurants (tenant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.integration_events ADD CONSTRAINT fk_integration_events_restaurant
+  FOREIGN KEY (tenant_id,restaurant_id) REFERENCES plato_draft.restaurants (tenant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.integration_events ADD CONSTRAINT fk_integration_events_connection_id
+  FOREIGN KEY (tenant_id,restaurant_id,connection_id) REFERENCES plato_draft.integration_connections (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_integration_events_connection_id_idx ON plato_draft.integration_events (tenant_id,restaurant_id,connection_id);
+ALTER TABLE plato_draft.notification_deliveries ADD CONSTRAINT fk_notification_deliveries_restaurant
+  FOREIGN KEY (tenant_id,restaurant_id) REFERENCES plato_draft.restaurants (tenant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.notification_deliveries ADD CONSTRAINT fk_notification_deliveries_connection_id
+  FOREIGN KEY (tenant_id,restaurant_id,connection_id) REFERENCES plato_draft.integration_connections (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_notification_deliveries_connection_id_idx ON plato_draft.notification_deliveries (tenant_id,restaurant_id,connection_id);
+ALTER TABLE plato_draft.notification_deliveries ADD CONSTRAINT fk_notification_deliveries_campaign_recipient_id
+  FOREIGN KEY (tenant_id,restaurant_id,campaign_recipient_id) REFERENCES plato_draft.campaign_recipients (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_notification_deliveries_campaign_recipient_id_idx ON plato_draft.notification_deliveries (tenant_id,restaurant_id,campaign_recipient_id);
+ALTER TABLE plato_draft.notification_deliveries ADD CONSTRAINT fk_notification_deliveries_order_id
+  FOREIGN KEY (tenant_id,restaurant_id,order_branch_id,order_id) REFERENCES plato_draft.orders (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_notification_deliveries_order_id_idx ON plato_draft.notification_deliveries (tenant_id,restaurant_id,order_branch_id,order_id);
+ALTER TABLE plato_draft.notification_deliveries ADD CONSTRAINT fk_notification_deliveries_customer_id
+  FOREIGN KEY (tenant_id,restaurant_id,customer_id) REFERENCES plato_draft.customers (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_notification_deliveries_customer_id_idx ON plato_draft.notification_deliveries (tenant_id,restaurant_id,customer_id);
+ALTER TABLE plato_draft.roles ADD CONSTRAINT fk_roles_restaurant
+  FOREIGN KEY (tenant_id,restaurant_id) REFERENCES plato_draft.restaurants (tenant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.role_permissions ADD CONSTRAINT fk_role_permissions_restaurant
+  FOREIGN KEY (tenant_id,restaurant_id) REFERENCES plato_draft.restaurants (tenant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.role_permissions ADD CONSTRAINT fk_role_permissions_role_id
+  FOREIGN KEY (tenant_id,restaurant_id,role_id) REFERENCES plato_draft.roles (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_role_permissions_role_id_idx ON plato_draft.role_permissions (tenant_id,restaurant_id,role_id);
+ALTER TABLE plato_draft.role_permissions ADD CONSTRAINT fk_role_permissions_permission_id
+  FOREIGN KEY (permission_id) REFERENCES plato_draft.permissions (id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_role_permissions_permission_id_idx ON plato_draft.role_permissions (permission_id);
+ALTER TABLE plato_draft.auth_sessions ADD CONSTRAINT fk_auth_sessions_user_id
+  FOREIGN KEY (user_id) REFERENCES plato_draft.users (id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_auth_sessions_user_id_idx ON plato_draft.auth_sessions (user_id);
+ALTER TABLE plato_draft.branch_schedule_exceptions ADD CONSTRAINT fk_branch_schedule_exceptions_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.delivery_time_slots ADD CONSTRAINT fk_delivery_time_slots_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.stock_reservations ADD CONSTRAINT fk_stock_reservations_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.stock_reservations ADD CONSTRAINT fk_stock_reservations_stock_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,stock_id) REFERENCES plato_draft.item_stock (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_stock_reservations_stock_id_idx ON plato_draft.stock_reservations (tenant_id,restaurant_id,branch_id,stock_id);
+ALTER TABLE plato_draft.stock_reservations ADD CONSTRAINT fk_stock_reservations_order_item_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,order_item_id) REFERENCES plato_draft.order_items (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_stock_reservations_order_item_id_idx ON plato_draft.stock_reservations (tenant_id,restaurant_id,branch_id,order_item_id);
+ALTER TABLE plato_draft.addon_groups ADD CONSTRAINT fk_addon_groups_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.addon_group_options ADD CONSTRAINT fk_addon_group_options_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.addon_group_options ADD CONSTRAINT fk_addon_group_options_group_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,group_id) REFERENCES plato_draft.addon_groups (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_addon_group_options_group_id_idx ON plato_draft.addon_group_options (tenant_id,restaurant_id,branch_id,group_id);
+ALTER TABLE plato_draft.addon_group_options ADD CONSTRAINT fk_addon_group_options_addon_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,addon_id) REFERENCES plato_draft.addons (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_addon_group_options_addon_id_idx ON plato_draft.addon_group_options (tenant_id,restaurant_id,branch_id,addon_id);
+ALTER TABLE plato_draft.item_addon_groups ADD CONSTRAINT fk_item_addon_groups_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.item_addon_groups ADD CONSTRAINT fk_item_addon_groups_item_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,item_id) REFERENCES plato_draft.menu_items (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_item_addon_groups_item_id_idx ON plato_draft.item_addon_groups (tenant_id,restaurant_id,branch_id,item_id);
+ALTER TABLE plato_draft.item_addon_groups ADD CONSTRAINT fk_item_addon_groups_group_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,group_id) REFERENCES plato_draft.addon_groups (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_item_addon_groups_group_id_idx ON plato_draft.item_addon_groups (tenant_id,restaurant_id,branch_id,group_id);
+ALTER TABLE plato_draft.promotion_branches ADD CONSTRAINT fk_promotion_branches_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.promotion_branches ADD CONSTRAINT fk_promotion_branches_promotion_id
+  FOREIGN KEY (tenant_id,restaurant_id,promotion_id) REFERENCES plato_draft.promotions (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_promotion_branches_promotion_id_idx ON plato_draft.promotion_branches (tenant_id,restaurant_id,promotion_id);
+ALTER TABLE plato_draft.promotion_items ADD CONSTRAINT fk_promotion_items_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.promotion_items ADD CONSTRAINT fk_promotion_items_promotion_id
+  FOREIGN KEY (tenant_id,restaurant_id,promotion_id) REFERENCES plato_draft.promotions (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_promotion_items_promotion_id_idx ON plato_draft.promotion_items (tenant_id,restaurant_id,promotion_id);
+ALTER TABLE plato_draft.promotion_items ADD CONSTRAINT fk_promotion_items_item_id
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,item_id) REFERENCES plato_draft.menu_items (tenant_id,restaurant_id,branch_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_promotion_items_item_id_idx ON plato_draft.promotion_items (tenant_id,restaurant_id,branch_id,item_id);
+ALTER TABLE plato_draft.media_assets ADD CONSTRAINT fk_media_assets_restaurant
+  FOREIGN KEY (tenant_id,restaurant_id) REFERENCES plato_draft.restaurants (tenant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.media_assets ADD CONSTRAINT fk_media_assets_created_by_membership_id
+  FOREIGN KEY (tenant_id,restaurant_id,created_by_membership_id) REFERENCES plato_draft.staff_memberships (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_media_assets_created_by_membership_id_idx ON plato_draft.media_assets (tenant_id,restaurant_id,created_by_membership_id);
+ALTER TABLE plato_draft.report_exports ADD CONSTRAINT fk_report_exports_restaurant
+  FOREIGN KEY (tenant_id,restaurant_id) REFERENCES plato_draft.restaurants (tenant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.report_exports ADD CONSTRAINT fk_report_exports_requested_by_membership_id
+  FOREIGN KEY (tenant_id,restaurant_id,requested_by_membership_id) REFERENCES plato_draft.staff_memberships (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_report_exports_requested_by_membership_id_idx ON plato_draft.report_exports (tenant_id,restaurant_id,requested_by_membership_id);
+ALTER TABLE plato_draft.background_jobs ADD CONSTRAINT fk_background_jobs_restaurant
+  FOREIGN KEY (tenant_id,restaurant_id) REFERENCES plato_draft.restaurants (tenant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.audit_logs ADD CONSTRAINT fk_audit_logs_tenant
+  FOREIGN KEY (tenant_id) REFERENCES plato_draft.tenants (id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.audit_logs ADD CONSTRAINT fk_audit_logs_actor_user_id
+  FOREIGN KEY (actor_user_id) REFERENCES plato_draft.users (id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_audit_logs_actor_user_id_idx ON plato_draft.audit_logs (actor_user_id);
+ALTER TABLE plato_draft.billing_invoices ADD CONSTRAINT fk_billing_invoices_tenant
+  FOREIGN KEY (tenant_id) REFERENCES plato_draft.tenants (id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.billing_invoices ADD CONSTRAINT fk_billing_invoices_subscription_id
+  FOREIGN KEY (tenant_id,subscription_id) REFERENCES plato_draft.tenant_subscriptions (tenant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_billing_invoices_subscription_id_idx ON plato_draft.billing_invoices (tenant_id,subscription_id);
+ALTER TABLE plato_draft.billing_invoice_items ADD CONSTRAINT fk_billing_invoice_items_tenant
+  FOREIGN KEY (tenant_id) REFERENCES plato_draft.tenants (id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.billing_invoice_items ADD CONSTRAINT fk_billing_invoice_items_invoice_id
+  FOREIGN KEY (tenant_id,invoice_id) REFERENCES plato_draft.billing_invoices (tenant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_billing_invoice_items_invoice_id_idx ON plato_draft.billing_invoice_items (tenant_id,invoice_id);
+ALTER TABLE plato_draft.billing_payments ADD CONSTRAINT fk_billing_payments_tenant
+  FOREIGN KEY (tenant_id) REFERENCES plato_draft.tenants (id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.billing_payments ADD CONSTRAINT fk_billing_payments_invoice_id
+  FOREIGN KEY (tenant_id,invoice_id) REFERENCES plato_draft.billing_invoices (tenant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_billing_payments_invoice_id_idx ON plato_draft.billing_payments (tenant_id,invoice_id);
+ALTER TABLE plato_draft.promotions ADD CONSTRAINT fk_promotions_branch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id) REFERENCES plato_draft.branches (tenant_id,restaurant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.audit_logs ADD CONSTRAINT fk_audit_logs_restaurant
+  FOREIGN KEY (tenant_id,restaurant_id) REFERENCES plato_draft.restaurants (tenant_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE plato_draft.item_variants ADD CONSTRAINT uq_item_variants_item UNIQUE (tenant_id,restaurant_id,branch_id,item_id,id);
+ALTER TABLE plato_draft.item_stock ADD CONSTRAINT fk_item_stock_variant_item
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,item_id,variant_id) REFERENCES plato_draft.item_variants (tenant_id,restaurant_id,branch_id,item_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_item_stock_variant_item_idx ON plato_draft.item_stock (tenant_id,restaurant_id,branch_id,item_id,variant_id);
+ALTER TABLE plato_draft.order_items ADD CONSTRAINT fk_order_items_variant_item
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,item_id,variant_id) REFERENCES plato_draft.item_variants (tenant_id,restaurant_id,branch_id,item_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_order_items_variant_item_idx ON plato_draft.order_items (tenant_id,restaurant_id,branch_id,item_id,variant_id);
+ALTER TABLE plato_draft.recipes ADD CONSTRAINT fk_recipes_variant_item
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,item_id,variant_id) REFERENCES plato_draft.item_variants (tenant_id,restaurant_id,branch_id,item_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_recipes_variant_item_idx ON plato_draft.recipes (tenant_id,restaurant_id,branch_id,item_id,variant_id);
+ALTER TABLE plato_draft.order_items ADD CONSTRAINT uq_order_items_item UNIQUE (tenant_id,restaurant_id,branch_id,item_id,id);
+ALTER TABLE plato_draft.order_item_addons ADD CONSTRAINT fk_order_addons_line_item
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,item_id,order_item_id) REFERENCES plato_draft.order_items (tenant_id,restaurant_id,branch_id,item_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_order_addons_line_item_idx ON plato_draft.order_item_addons (tenant_id,restaurant_id,branch_id,item_id,order_item_id);
+ALTER TABLE plato_draft.order_item_addons ADD CONSTRAINT fk_order_addons_allowed
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,item_id,addon_id) REFERENCES plato_draft.item_addons (tenant_id,restaurant_id,branch_id,item_id,addon_id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_order_addons_allowed_idx ON plato_draft.order_item_addons (tenant_id,restaurant_id,branch_id,item_id,addon_id);
+ALTER TABLE plato_draft.kitchen_tickets ADD CONSTRAINT uq_kitchen_tickets_order UNIQUE (tenant_id,restaurant_id,branch_id,order_id,id);
+ALTER TABLE plato_draft.order_items ADD CONSTRAINT uq_order_items_order UNIQUE (tenant_id,restaurant_id,branch_id,order_id,id);
+ALTER TABLE plato_draft.kitchen_ticket_items ADD CONSTRAINT fk_ticket_items_same_order_ticket
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,order_id,ticket_id) REFERENCES plato_draft.kitchen_tickets (tenant_id,restaurant_id,branch_id,order_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_ticket_items_same_order_ticket_idx ON plato_draft.kitchen_ticket_items (tenant_id,restaurant_id,branch_id,order_id,ticket_id);
+ALTER TABLE plato_draft.kitchen_ticket_items ADD CONSTRAINT fk_ticket_items_same_order_line
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,order_id,order_item_id) REFERENCES plato_draft.order_items (tenant_id,restaurant_id,branch_id,order_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_ticket_items_same_order_line_idx ON plato_draft.kitchen_ticket_items (tenant_id,restaurant_id,branch_id,order_id,order_item_id);
+ALTER TABLE plato_draft.goods_receipts ADD CONSTRAINT uq_goods_receipts_purchase UNIQUE (tenant_id,restaurant_id,branch_id,purchase_order_id,id);
+ALTER TABLE plato_draft.purchase_order_items ADD CONSTRAINT uq_purchase_order_items_purchase UNIQUE (tenant_id,restaurant_id,branch_id,purchase_order_id,id);
+ALTER TABLE plato_draft.goods_receipt_items ADD CONSTRAINT fk_received_items_purchase_receipt
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,purchase_order_id,receipt_id) REFERENCES plato_draft.goods_receipts (tenant_id,restaurant_id,branch_id,purchase_order_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_received_items_purchase_receipt_idx ON plato_draft.goods_receipt_items (tenant_id,restaurant_id,branch_id,purchase_order_id,receipt_id);
+ALTER TABLE plato_draft.goods_receipt_items ADD CONSTRAINT fk_received_items_purchase_line
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,purchase_order_id,purchase_order_item_id) REFERENCES plato_draft.purchase_order_items (tenant_id,restaurant_id,branch_id,purchase_order_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_received_items_purchase_line_idx ON plato_draft.goods_receipt_items (tenant_id,restaurant_id,branch_id,purchase_order_id,purchase_order_item_id);
+ALTER TABLE plato_draft.stock_batches ADD CONSTRAINT uq_stock_batches_stock UNIQUE (tenant_id,restaurant_id,branch_id,stock_id,id);
+ALTER TABLE plato_draft.waste_records ADD CONSTRAINT fk_waste_same_stock_batch
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,stock_id,batch_id) REFERENCES plato_draft.stock_batches (tenant_id,restaurant_id,branch_id,stock_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_waste_same_stock_batch_idx ON plato_draft.waste_records (tenant_id,restaurant_id,branch_id,stock_id,batch_id);
+ALTER TABLE plato_draft.staff_shifts ADD CONSTRAINT uq_staff_shifts_staff UNIQUE (tenant_id,restaurant_id,branch_id,membership_id,id);
+ALTER TABLE plato_draft.attendance_records ADD CONSTRAINT fk_attendance_same_shift_staff
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,membership_id,shift_id) REFERENCES plato_draft.staff_shifts (tenant_id,restaurant_id,branch_id,membership_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_attendance_same_shift_staff_idx ON plato_draft.attendance_records (tenant_id,restaurant_id,branch_id,membership_id,shift_id);
+ALTER TABLE plato_draft.orders ADD CONSTRAINT uq_orders_promotion UNIQUE (tenant_id,restaurant_id,branch_id,promotion_id,id);
+ALTER TABLE plato_draft.promotion_redemptions ADD CONSTRAINT fk_redemptions_order_promotion
+  FOREIGN KEY (tenant_id,restaurant_id,branch_id,promotion_id,order_id) REFERENCES plato_draft.orders (tenant_id,restaurant_id,branch_id,promotion_id,id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_redemptions_order_promotion_idx ON plato_draft.promotion_redemptions (tenant_id,restaurant_id,branch_id,promotion_id,order_id);
+ALTER TABLE plato_draft.restaurants ADD CONSTRAINT uq_restaurants_owner UNIQUE (tenant_id,id,owner_user_id);
+ALTER TABLE plato_draft.refunds ADD CONSTRAINT fk_refunds_restaurant_owner
+  FOREIGN KEY (tenant_id,restaurant_id,requested_by_owner_user_id) REFERENCES plato_draft.restaurants (tenant_id,id,owner_user_id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_refunds_restaurant_owner_idx ON plato_draft.refunds (tenant_id,restaurant_id,requested_by_owner_user_id);
+ALTER TABLE plato_draft.recommendation_decisions ADD CONSTRAINT fk_recommendation_decisions_restaurant_owner
+  FOREIGN KEY (tenant_id,restaurant_id,owner_user_id) REFERENCES plato_draft.restaurants (tenant_id,id,owner_user_id)
+  ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_recommendation_decisions_restaurant_owner_idx ON plato_draft.recommendation_decisions (tenant_id,restaurant_id,owner_user_id);
+ALTER TABLE plato_draft.refunds ADD CONSTRAINT refunds_exactly_one_actor CHECK (num_nonnulls(requested_by_membership_id,requested_by_owner_user_id)=1);
+ALTER TABLE plato_draft.recommendation_decisions ADD CONSTRAINT recommendation_one_actor CHECK (num_nonnulls(manager_membership_id,owner_user_id)=1);
+CREATE UNIQUE INDEX item_stock_position_uq ON plato_draft.item_stock (tenant_id,restaurant_id,branch_id,item_id,variant_id) NULLS NOT DISTINCT;
+CREATE UNIQUE INDEX recipes_version_uq ON plato_draft.recipes (tenant_id,restaurant_id,branch_id,item_id,variant_id,version) NULLS NOT DISTINCT;
+CREATE UNIQUE INDEX cash_sessions_one_open_uq ON plato_draft.cash_sessions (tenant_id,restaurant_id,branch_id,register_id) WHERE closed_at IS NULL;
+CREATE UNIQUE INDEX tenant_subscription_one_active_uq ON plato_draft.tenant_subscriptions (tenant_id) WHERE status='active';
+ALTER TABLE plato_draft.staff_memberships ADD CONSTRAINT fk_staff_memberships_configured_role_id FOREIGN KEY (tenant_id,restaurant_id,configured_role_id) REFERENCES plato_draft.roles (tenant_id,restaurant_id,id) ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_staff_memberships_configured_role_id_idx ON plato_draft.staff_memberships (tenant_id,restaurant_id,configured_role_id);
+ALTER TABLE plato_draft.restaurants ADD CONSTRAINT fk_restaurants_template_catalog_id FOREIGN KEY (template_catalog_id) REFERENCES plato_draft.template_catalog (id) ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_restaurants_template_catalog_id_idx ON plato_draft.restaurants (template_catalog_id);
+ALTER TABLE plato_draft.menu_items ADD CONSTRAINT fk_menu_items_media_asset_id FOREIGN KEY (tenant_id,restaurant_id,media_asset_id) REFERENCES plato_draft.media_assets (tenant_id,restaurant_id,id) ON UPDATE RESTRICT ON DELETE RESTRICT;
+CREATE INDEX fk_menu_items_media_asset_id_idx ON plato_draft.menu_items (tenant_id,restaurant_id,media_asset_id);

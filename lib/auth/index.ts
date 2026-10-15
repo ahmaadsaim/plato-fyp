@@ -22,13 +22,11 @@ const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 7; // 7 days
 function getJwtSecret(): Uint8Array {
   const secret = process.env.AUTH_SECRET;
 
-  if (!secret && process.env.NODE_ENV === "production") {
-    throw new Error("AUTH_SECRET must be configured in production.");
+  if (!secret) {
+    throw new Error("AUTH_SECRET must be configured.");
   }
 
-  return new TextEncoder().encode(
-    secret || "local-development-secret-change-me"
-  );
+  return new TextEncoder().encode(secret);
 }
 
 // ─── Password Helpers ─────────────────────────────────────────────────────────
@@ -91,22 +89,10 @@ export async function getSessionUser(): Promise<User | null> {
     const userId = payload.sub;
     if (!userId) return null;
 
-    try {
-      const dbUser = await queryOne<User>(
-        "SELECT id, name, email, created_at FROM users WHERE id = $1",
-        [userId]
-      );
-      if (dbUser) return dbUser;
-    } catch {
-      // Fallback to JWT payload if database is offline
-    }
-
-    return {
-      id: userId,
-      name: (payload.name as string) || "Merchant Admin",
-      email: (payload.email as string) || "admin@plato.local",
-      created_at: new Date().toISOString(),
-    };
+    return await queryOne<User>(
+      "SELECT id, name, email, created_at FROM users WHERE id = $1",
+      [userId]
+    );
   } catch {
     return null;
   }
@@ -121,7 +107,7 @@ export async function requireUser(): Promise<User> {
   return user;
 }
 
-/** Verifies user password against database hash or fallback credentials. */
+/** Verifies the current user's password against their stored database hash. */
 export async function verifyUserPassword(
   userId: string,
   email: string,
@@ -131,24 +117,15 @@ export async function verifyUserPassword(
 
   try {
     const user = await queryOne<{ password_hash: string }>(
-      "SELECT password_hash FROM users WHERE id = $1 OR email = $2",
+      "SELECT password_hash FROM users WHERE id = $1 AND email = $2",
       [userId, email.toLowerCase()]
     );
     if (user && user.password_hash) {
       const isMatch = await verifyPassword(passwordAttempt, user.password_hash);
       if (isMatch) return true;
     }
-  } catch (err) {
-    console.warn("[verifyUserPassword] DB query warning:", err);
-  }
-
-  // Fast fallback for local demo sessions / dev without DB
-  if (
-    passwordAttempt === "plato123" ||
-    passwordAttempt === "password123" ||
-    passwordAttempt === "admin123"
-  ) {
-    return true;
+  } catch {
+    return false;
   }
 
   return false;

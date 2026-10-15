@@ -205,9 +205,13 @@ export async function deleteTenantAction(
 
   try {
     const { deleteTenantBySlug } = await import("@/lib/tenant/repository");
-    await deleteTenantBySlug(slug, user.id);
+    const deleted = await deleteTenantBySlug(slug, user.id);
+    if (!deleted) {
+      return { success: false, error: "Restaurant could not be deleted. Please try again." };
+    }
   } catch (err) {
     console.warn("[deleteTenantAction] DB delete warning:", err);
+    return { success: false, error: "Restaurant could not be deleted. Please try again." };
   }
 
   revalidatePath("/dashboard");

@@ -41,7 +41,7 @@ export async function signupAction(
     const passwordHash = await hashPassword(password);
 
     const newUser = await queryOne<{ id: string; name: string; email: string }>(
-      "INSERT INTO users (name, email, password_hash) VALUES ($1, $2, $3) RETURNING id, name, email",
+      "INSERT INTO users (name, email, password_hash) VALUES ($1, $2, $3) ON CONFLICT (email) DO NOTHING RETURNING id, name, email",
       [name, email, passwordHash]
     );
 
@@ -49,19 +49,14 @@ export async function signupAction(
       await createSession(newUser);
       redirect("/dashboard");
     }
+    return { error: "An account with this email already exists." };
   } catch (error) {
     // If NEXT_REDIRECT was thrown, rethrow it
     if ((error as { digest?: string })?.digest?.startsWith("NEXT_REDIRECT")) {
       throw error;
     }
 
-    console.warn("[signupAction] Database offline, starting local development session.");
-    await createSession({
-      id: "local-user-" + Date.now(),
-      name: name,
-      email: email,
-    });
-    redirect("/dashboard");
+    return { error: "Unable to create your account. Please try again later." };
   }
 
   return { error: "Failed to create account. Please try again." };
@@ -80,24 +75,7 @@ export async function loginAction(
     return { error: "Please enter both email and password." };
   }
 
-  // 1. Fast-track demo credentials for instant local evaluation
-  const isDemoUser =
-    (email === "demo@plato.local" ||
-      email === "admin@plato.local" ||
-      email === "admin@plato.com" ||
-      email === "saim@example.com") &&
-    (password === "plato123" || password === "password123");
-
-  if (isDemoUser) {
-    await createSession({
-      id: "demo-merchant-0001",
-      name: "Saim (Store Owner)",
-      email: email,
-    });
-    redirect("/dashboard");
-  }
-
-  // 2. Query PostgreSQL
+  // Authenticate against the persistent database.
   try {
     const user = await queryOne<{
       id: string;
@@ -108,7 +86,7 @@ export async function loginAction(
 
     if (!user) {
       return {
-        error: "Invalid email or password. (Demo: demo@plato.local / plato123)",
+        error: "Invalid email or password.",
       };
     }
 
@@ -125,10 +103,8 @@ export async function loginAction(
       throw error;
     }
 
-    console.warn("[loginAction] Database connection failed:", (error as Error).message);
     return {
-      error:
-        "Database is offline. You can sign in using demo credentials: demo@plato.local / plato123",
+      error: "Unable to sign in right now. Please try again later.",
     };
   }
 }
