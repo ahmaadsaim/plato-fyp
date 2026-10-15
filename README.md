@@ -118,6 +118,8 @@ npm run db:check   # Verify database connection and table counts
 npm run test:db    # Database/auth regression tests (no live database writes)
 ```
 
+Pull requests also receive a SonarCloud quality-gate check. Review its annotations for issues in changed code alongside the local test, lint and build results. CodeRabbit can report a successful status while its review is skipped; that status does not represent a completed code review.
+
 ## Project structure
 
 ```text

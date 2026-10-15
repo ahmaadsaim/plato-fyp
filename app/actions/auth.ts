@@ -58,8 +58,6 @@ export async function signupAction(
 
     return { error: "Unable to create your account. Please try again later." };
   }
-
-  return { error: "Failed to create account. Please try again." };
 }
 
 // ─── Login ────────────────────────────────────────────────────────────────────
