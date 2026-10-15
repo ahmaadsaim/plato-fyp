@@ -1,53 +1,54 @@
+"use client";
+
 import React from "react";
-import Link from "next/link";
-import { User } from "@/lib/auth";
+import { User as AuthUser } from "@/lib/auth";
+import { AuthProvider } from "./AuthContext";
+import { AuthModal } from "./AuthModal";
+import { Navbar } from "./Navbar";
+import { Hero } from "./Hero";
+import { SystemMockup } from "./SystemMockup";
+import { TrustBand } from "./TrustBand";
+import { BentoFeatures } from "./BentoFeatures";
+import { MenuScanAnimation } from "./MenuScanAnimation";
+import { ShowcaseModule } from "./ShowcaseModule";
+import { KitchenDarkSection } from "./KitchenDarkSection";
+import { IntegrationsSection } from "./IntegrationsSection";
+import { PricingPlans } from "./PricingPlans";
+import { RecapAndCta } from "./RecapAndCta";
+import { Footer } from "./Footer";
 
 interface PlatformLandingProps {
-  user: User | null;
+  user: AuthUser | null;
 }
 
 export function PlatformLanding({ user }: PlatformLandingProps) {
-  return (
-    <main className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col items-center justify-center p-6">
-      <div className="w-full max-w-md text-center space-y-8">
-        <div className="space-y-3">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-zinc-900 border border-zinc-800 text-3xl mb-2 shadow-sm">
-            🍽️
-          </div>
-          <h1 className="text-4xl font-black tracking-tight text-white">
-            Restaurant Platform
-          </h1>
-          <p className="text-sm text-zinc-400">
-            Simple Multi-Tenant SaaS Foundation
-          </p>
-        </div>
+  const initialUser = user
+    ? {
+        name: user.name,
+        email: user.email,
+        provider: "email" as const,
+      }
+    : null;
 
-        <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4">
-          {user ? (
-            <Link
-              href="/dashboard"
-              className="w-full sm:w-auto px-6 py-3 rounded-xl font-semibold bg-white text-zinc-900 hover:bg-zinc-200 transition-colors shadow-sm text-center cursor-pointer"
-            >
-              Go to Dashboard ({user.name}) →
-            </Link>
-          ) : (
-            <>
-              <Link
-                href="/login"
-                className="w-full sm:w-auto px-6 py-3 rounded-xl font-semibold bg-zinc-900 hover:bg-zinc-800 text-white border border-zinc-800 transition-colors text-center cursor-pointer"
-              >
-                Login
-              </Link>
-              <Link
-                href="/signup"
-                className="w-full sm:w-auto px-6 py-3 rounded-xl font-semibold bg-white text-zinc-900 hover:bg-zinc-200 transition-colors shadow-sm text-center cursor-pointer"
-              >
-                Create Account
-              </Link>
-            </>
-          )}
-        </div>
+  return (
+    <AuthProvider initialUser={initialUser}>
+      <div className="min-h-screen bg-white text-neutral-900 flex flex-col selection:bg-lime-200 selection:text-black">
+        <Navbar />
+        <main className="flex-1">
+          <Hero />
+          <SystemMockup />
+          <TrustBand />
+          <BentoFeatures />
+          <MenuScanAnimation />
+          <ShowcaseModule />
+          <KitchenDarkSection />
+          <IntegrationsSection />
+          <PricingPlans />
+          <RecapAndCta />
+        </main>
+        <Footer />
+        <AuthModal />
       </div>
-    </main>
+    </AuthProvider>
   );
 }

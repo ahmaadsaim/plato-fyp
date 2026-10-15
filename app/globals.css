@@ -35,3 +35,75 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* Base interactive button: gentle 1.5px micro-lift, crisp depth, tactile click */
+.btn-animate {
+  position: relative;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              background-color 0.18s ease,
+              border-color 0.18s ease,
+              color 0.18s ease;
+  will-change: transform, box-shadow;
+}
+
+.btn-animate:hover {
+  transform: translateY(-1.5px);
+  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.08);
+}
+
+.btn-animate:active {
+  transform: translateY(0.5px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition-duration: 0.08s;
+}
+
+/* Primary dark button (Obsidian / Apple style) */
+.btn-animate-dark {
+  position: relative;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 2px 5px rgba(0, 0, 0, 0.12);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              background-color 0.2s ease;
+  will-change: transform, box-shadow;
+}
+
+.btn-animate-dark:hover {
+  transform: translateY(-1.5px);
+  background-color: #1a1a1f;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), 
+              0 8px 22px -3px rgba(0, 0, 0, 0.28), 
+              0 3px 7px -2px rgba(0, 0, 0, 0.15);
+}
+
+.btn-animate-dark:active {
+  transform: translateY(0.5px);
+  background-color: #0c0c0e;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 
+              0 2px 4px rgba(0, 0, 0, 0.2);
+  transition-duration: 0.08s;
+}
+
+/* Lime accent button */
+.btn-animate-lime {
+  position: relative;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 2px 6px rgba(132, 204, 22, 0.18);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              background-color 0.2s ease;
+  will-change: transform, box-shadow;
+}
+
+.btn-animate-lime:hover {
+  transform: translateY(-1.5px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55), 
+              0 8px 24px -4px rgba(132, 204, 22, 0.38), 
+              0 3px 8px -2px rgba(132, 204, 22, 0.2);
+}
+
+.btn-animate-lime:active {
+  transform: translateY(0.5px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 
+              0 2px 5px rgba(132, 204, 22, 0.25);
+  transition-duration: 0.08s;
+}
+
