@@ -8,7 +8,7 @@ The application is built with Next.js, React, TypeScript, and PostgreSQL. Themes
 
 - Node.js 20.9 or newer
 - npm
-- PostgreSQL 14 or newer, running locally or hosted
+- A Neon PostgreSQL project (Free plan is sufficient to start development)
 
 ## Initialize locally
 
@@ -16,17 +16,20 @@ Clone the repository and install dependencies:
 
 ```bash
 git clone https://github.com/ahmaadsaim/plato-fyp.git
-cd fyp-plato
+cd plato-fyp
 npm install
 ```
 
 Create `.env.local` in the project root:
 
 ```env
-# PostgreSQL connection string used by the pg client
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/plato
+# Copy both URLs from the Neon project's Connect panel; retain SSL parameters.
+# Pooled URL for the application (hostname contains -pooler).
+DATABASE_URL="<NEON_POOLED_CONNECTION_URL>"
+# Direct URL for explicit schema migrations.
+DATABASE_URL_UNPOOLED="<NEON_DIRECT_CONNECTION_URL>"
 
-# Use a long random value in every shared or production environment
+# Required in development and production; generate a long random value
 AUTH_SECRET=replace-with-a-long-random-secret
 
 # Local tenant URLs are http://<slug>.localhost:3000
@@ -38,25 +41,49 @@ PLATFORM_DOMAIN=localhost:3000
 
 ## Initialize the database
 
-Create a PostgreSQL database named `plato` if it does not already exist:
+Ask the project owner for Neon access, then copy the pooled and direct connection URLs for the assigned development branch into `.env.local`. Do not use the production branch for routine development or share credentials in Git/chat. The app can run locally while its database runs on Neon.
+
+For a new empty database, apply the existing schema once:
 
 ```bash
-createdb plato
+npm run db:migrate
 ```
 
-Apply the schema:
+Verify connectivity and table counts:
 
 ```bash
-psql "$DATABASE_URL" -f lib/schema.sql
+npm run db:check
 ```
 
-If your shell does not load `.env.local` automatically, provide the connection string directly:
+Both commands load Next.js environment files; process environment values take precedence. Schema migration prefers `DATABASE_URL_UNPOOLED`, falling back to `DATABASE_URL`. The running app uses the three Neon tables `users`, `tenants`, and `theme_overrides`. Connection URLs must point to Neon and require SSL; localhost PostgreSQL is no longer an application backend. Application startup does not change the schema, and database failures do not switch to an in-memory store.
+
+See [DATABASE_TABLES.md](DATABASE_TABLES.md) for the proposed whole-FYP table inventory, including later and conditional modules. It identifies candidates only; it is not an implemented schema.
+
+The [schema design under lib](lib/schema-design/README.md) contains review SQL and [relationship diagrams](lib/schema-design/relationships.md). It is separate from `lib/schema.sql` and `db:migrate`; the tenant model and several business rules remain unresolved. Use a disposable database to review the SQL, not the source database or Neon production.
+
+Signup stores a merchant account and bcrypt password hash in Neon's `users` table. Login checks that stored hash; sessions require `AUTH_SECRET` and a user still present in Neon. Demo credentials and temporary sessions have been removed. Missing tenants return 404 instead of generating a demo restaurant. Restaurant and theme-override writes use the same Neon connection.
+
+The current setup starts fresh on Neon; local records are not imported. `db:migrate` initializes/updates the schema without resetting existing records. Global template JSON files stay in the project and are rendered as before. Menu, order and branch modules from the schema draft are not integrated by this setup.
+
+### Completed integration — 2026-10-09
+
+- Successfully applied `lib/schema.sql` to Neon using `npm run db:migrate`: `users`, `tenants`, and `theme_overrides`.
+- Connected the existing account, restaurant and theme-override flows to Neon; removed local database and demo-auth fallbacks.
+- Added database/schema checks before development and production startup.
+- Verification passed: 10 database/auth regression tests, TypeScript and production build. ESLint reported 0 errors and 43 existing warnings.
+
+The regression tests use stubbed database connections; live signup/login and a separate post-migration table-count check remain unverified. The whole-FYP SQL and relationship diagrams remain a review draft.
+
+### Optional Neon CLI
+
+The repository includes a minimal `neon.ts` policy. After installing the Neon CLI and logging in, link your assigned branch and pull connection variables:
 
 ```bash
-psql "postgresql://postgres:postgres@localhost:5432/plato" -f lib/schema.sql
+neon link --project-id lingering-thunder-08132311 --branch <YOUR_DEVELOPMENT_BRANCH> -y --no-env-pull --no-config
+neon env pull --service postgres
 ```
 
-The schema creates the `users` and `tenants` tables and the indexes required for tenant lookup. The application creates user and tenant records through its server actions; no seed script is required for a fresh install.
+Preserve your old local database connection privately before pulling variables. Check that `.env.local` contains the intended URLs. `neon config plan` previews configuration changes; `neon deploy` applies Neon service configuration, not SQL migrations, data imports, or website deployment. CLI, MCP and agent skills are optional for application connectivity.
 
 ## Run the application
 
@@ -65,6 +92,10 @@ Start the development server:
 ```bash
 npm run dev
 ```
+
+`npm run dev` first runs `scripts/connect-db.mjs` through npm's `predev` hook. It checks the Neon URL and `AUTH_SECRET`, opens a fresh connection, and verifies the three app tables before logging `[database] Connected successfully: <host>`. On failure it exits with an error and Next.js does not start. No password or full URL is logged. `npm run start` runs the same check using production environment files. Use `npm run db:check` for table counts.
+
+After editing `.env.local`, stop the running server with Ctrl+C and run `npm run dev` again to repeat the check. Existing terminal logs describe an earlier check. An inherited `DATABASE_URL` environment variable takes precedence over `.env.local`; update or remove it if it overrides your test URL. The application also replaces its connection pool if the loaded URL changes.
 
 Open [http://localhost:3000](http://localhost:3000). Useful routes are:
 
@@ -82,7 +113,12 @@ npm run dev       # Start the development server
 npm run lint      # Run ESLint
 npm run build     # Create a production build
 npm run start     # Serve the production build
+npm run db:migrate # Apply existing schema explicitly
+npm run db:check   # Verify database connection and table counts
+npm run test:db    # Database/auth regression tests (no live database writes)
 ```
+
+Pull requests also receive a SonarCloud quality-gate check. Review its annotations for issues in changed code alongside the local test, lint and build results. CodeRabbit can report a successful status while its review is skipped; that status does not represent a completed code review.
 
 ## Project structure
 
@@ -135,13 +171,12 @@ Work in the repository root and follow the existing codebase conventions. Do not
 1. Inspect package.json, README.md, lib/db/index.ts, lib/schema.sql, and the app routes before making changes.
 2. Confirm Node.js 20.9+ and npm are available, then run npm install.
 3. Create .env.local if it is missing with:
-   DATABASE_URL=postgresql://postgres:postgres@localhost:5432/plato
+   DATABASE_URL=<Neon pooled URL supplied privately by the project owner>
+   DATABASE_URL_UNPOOLED=<Neon direct URL for the assigned development branch>
    AUTH_SECRET=<generate a long random local secret>
    PLATFORM_DOMAIN=localhost:3000
    Do not commit .env.local or print secrets in the final response.
-4. Confirm PostgreSQL is available. Create the plato database if needed, then apply the schema with:
-   psql "$DATABASE_URL" -f lib/schema.sql
-   If DATABASE_URL is not exported by the shell, read the value from .env.local without exposing it and run the equivalent psql command.
+4. Confirm the assigned Neon development branch and whether local records need importing. Do not overwrite an existing database or initialize tables before a full dump restore. For an empty database, run npm run db:migrate; then run npm run db:check. These scripts load environment files without printing credentials.
 5. Run npm run lint and fix only errors caused by initialization. Do not make unrelated refactors.
 6. Start the app with npm run dev and verify that the platform home page, /signup, /login, /dashboard, and /demo respond correctly.
 7. Report the exact initialization steps completed, any prerequisite that needs manual action, and the local URL. Never claim the database was initialized unless the schema command succeeded.

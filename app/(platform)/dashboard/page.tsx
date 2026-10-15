@@ -8,16 +8,10 @@ import { getPlatformDomain } from "@/lib/platform";
 export default async function DashboardPage() {
   const user = await requireUser();
 
-  let tenants: Tenant[] = [];
-  try {
-    tenants = await query<Tenant>(
-      "SELECT id, user_id, name, slug, theme_id, theme_source, created_at FROM tenants WHERE user_id = $1 ORDER BY created_at DESC",
-      [user.id]
-    );
-  } catch (err) {
-    console.warn("[DashboardPage] Database query skipped (offline mode):", (err as Error).message);
-    tenants = [];
-  }
+  const tenants = await query<Tenant>(
+    "SELECT id, user_id, name, slug, theme_id, theme_source, created_at FROM tenants WHERE user_id = $1 ORDER BY created_at DESC",
+    [user.id]
+  );
 
   return (
     <DashboardView

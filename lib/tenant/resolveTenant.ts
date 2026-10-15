@@ -45,35 +45,15 @@ export async function resolveTenant(hostOverride?: string): Promise<Tenant | nul
     return null;
   }
 
-  let tenant: Tenant | null = null;
-  try {
-    tenant = await queryOne<Tenant>(
+  const tenant = await queryOne<Tenant>(
       "SELECT id, user_id, name, slug, theme_id, theme_source, created_at FROM tenants WHERE slug = $1",
       [slug.toLowerCase()]
-    );
-  } catch {
-    tenant = null;
-  }
+  );
 
   if (tenant) {
     tenant.theme_id = tenant.theme_id || "modern";
     tenant.theme_source = tenant.theme_source || "LOCAL";
     return tenant;
-  }
-
-  if (process.env.NODE_ENV !== "production") {
-    return {
-      id: "demo-tenant-" + slug,
-      user_id: "demo-user",
-      name: slug
-        .split("-")
-        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-        .join(" "),
-      slug: slug.toLowerCase(),
-      theme_id: "modern",
-      theme_source: "LOCAL",
-      created_at: new Date().toISOString(),
-    };
   }
 
   notFound();
