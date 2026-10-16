@@ -14,11 +14,9 @@ import {
   Database,
   Cpu,
 } from "lucide-react";
-import { useAuth } from "./AuthContext";
 import { HoverLines } from "./HoverWord";
 
 export function RecapAndCta() {
-  const { openSignUp, openSignIn } = useAuth();
   const recapPillars = [
     {
       icon: Zap,
@@ -109,18 +107,18 @@ export function RecapAndCta() {
 
           {/* Action CTAs */}
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3.5">
-            <button
-              onClick={openSignUp}
+            <Link
+              href="/signup"
               className="btn-animate-dark w-full sm:w-auto inline-flex items-center justify-center px-9 py-3.5 rounded-full bg-black text-white text-base font-semibold shadow-md hover:bg-neutral-900 cursor-pointer"
             >
               <span>Get started free</span>
-            </button>
-            <button
-              onClick={openSignIn}
+            </Link>
+            <Link
+              href="/login"
               className="btn-animate w-full sm:w-auto inline-flex items-center justify-center px-7 py-3.5 rounded-full bg-white border border-neutral-200 text-neutral-800 text-base font-medium shadow-sm hover:bg-neutral-50 hover:border-neutral-300 cursor-pointer"
             >
               <span>Log in to your account</span>
-            </button>
+            </Link>
           </div>
 
           <p className="mt-4 text-xs text-neutral-500 font-medium">

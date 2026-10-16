@@ -3,11 +3,9 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { Check } from "lucide-react";
-import { useAuth } from "./AuthContext";
 import { HoverLines } from "./HoverWord";
 
 export function PricingPlans() {
-  const { openSignUp } = useAuth();
   const [billingCycle, setBillingCycle] = useState<"monthly" | "annual">("annual");
 
   const plans = [
@@ -201,8 +199,8 @@ export function PricingPlans() {
 
                 {/* Plan CTA */}
                 <div>
-                  <button
-                    onClick={openSignUp}
+                  <Link
+                    href="/signup"
                     className={`w-full py-3.5 rounded-xl text-sm font-bold flex items-center justify-center cursor-pointer shadow-md ${
                       plan.popular
                         ? "btn-animate-lime bg-lime-500 text-black hover:bg-lime-400"
@@ -210,7 +208,7 @@ export function PricingPlans() {
                     }`}
                   >
                     <span>{plan.ctaText}</span>
-                  </button>
+                  </Link>
                 </div>
               </div>
             );

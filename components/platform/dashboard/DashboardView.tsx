@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 import type { User } from "@/lib/auth";
 import type { Tenant } from "@/lib/tenant";
-import { logoutAction } from "@/app/actions/auth";
+import { SignOutForm } from "@/components/platform/auth/SignOutForm";
 import { createTenantAction } from "@/app/actions/tenant";
 import { StoreSwitcher } from "./StoreSwitcher";
 import { NewRestaurantOnboarding } from "./NewRestaurantOnboarding";
@@ -243,15 +243,12 @@ export function DashboardView({
               <p className="text-[10px] text-zinc-500 font-mono mt-0.5">{user.email}</p>
             </div>
 
-            <form action={logoutAction}>
-              <button
-                type="submit"
-                title="Log out"
-                className="p-1.5 rounded-lg text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 border border-transparent hover:border-zinc-200 transition-colors cursor-pointer"
-              >
-                <LogOut className="w-4 h-4" />
-              </button>
-            </form>
+            <SignOutForm
+              size="icon-sm"
+              className="rounded-lg"
+            >
+              <LogOut className="w-4 h-4" />
+            </SignOutForm>
           </div>
         </div>
       </header>

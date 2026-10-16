@@ -2,24 +2,27 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   UtensilsCrossed,
   Menu,
   X,
   LogOut,
-  User as UserIcon,
   LayoutDashboard,
   ChevronDown,
+  ArrowRight,
 } from "lucide-react";
 import { useAuth } from "./AuthContext";
+import { SignOutForm } from "@/components/platform/auth/SignOutForm";
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
-  const { user, isAuthenticated, openSignIn, openSignUp, signOut } = useAuth();
+  const { user, isAuthenticated } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -28,6 +31,14 @@ export function Navbar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    const refreshRestoredPage = (event: PageTransitionEvent) => {
+      if (event.persisted) router.refresh();
+    };
+    window.addEventListener("pageshow", refreshRestoredPage);
+    return () => window.removeEventListener("pageshow", refreshRestoredPage);
+  }, [router]);
 
   // Close user dropdown on click outside
   useEffect(() => {
@@ -92,17 +103,9 @@ export function Navbar() {
                     onClick={() => setUserDropdownOpen(!userDropdownOpen)}
                     className="flex items-center gap-2.5 p-1 pl-2 pr-3 rounded-xl border border-neutral-200/80 bg-white/80 hover:bg-white text-xs font-semibold text-neutral-800 shadow-2xs transition-all cursor-pointer"
                   >
-                    {user.picture ? (
-                      <img
-                        src={user.picture}
-                        alt={user.name}
-                        className="w-6 h-6 rounded-full object-cover ring-1 ring-lime-500"
-                      />
-                    ) : (
-                      <div className="w-6 h-6 rounded-full bg-black text-white flex items-center justify-center text-[11px] font-bold">
-                        {user.name.charAt(0).toUpperCase()}
-                      </div>
-                    )}
+                    <div className="w-6 h-6 rounded-full bg-black text-white flex items-center justify-center text-[11px] font-bold">
+                      {user.name.charAt(0).toUpperCase()}
+                    </div>
                     <span className="max-w-[120px] truncate">{user.name}</span>
                     <ChevronDown className="w-3.5 h-3.5 text-neutral-400" />
                   </button>
@@ -114,9 +117,7 @@ export function Navbar() {
                         <p className="text-xs font-bold text-neutral-900 truncate">{user.name}</p>
                         <p className="text-[11px] text-neutral-500 truncate">{user.email}</p>
                         <div className="mt-1 flex items-center gap-1 text-[10px] text-lime-700 font-semibold">
-                          <span className="w-1.5 h-1.5 rounded-full bg-lime-500" />
-                          <span>{user.provider === "google" ? "Google Connected" : "Email Account"}</span>
-                        </div>
+                          </div>
                       </div>
 
                       <div className="py-1">
@@ -131,47 +132,38 @@ export function Navbar() {
                       </div>
 
                       <div className="pt-1 border-t border-neutral-100">
-                        <button
-                          onClick={() => {
-                            setUserDropdownOpen(false);
-                            signOut();
-                          }}
-                          className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                        <SignOutForm
+                          size="sm"
+                          className="w-full justify-start rounded-xl px-3 py-2 text-xs font-medium"
                         >
                           <LogOut className="w-3.5 h-3.5" />
                           <span>Sign Out</span>
-                        </button>
+                        </SignOutForm>
                       </div>
                     </div>
                   )}
                 </div>
               ) : (
-                <>
-                  <button
-                    onClick={openSignIn}
-                    className="btn-animate px-3.5 py-1.5 text-sm font-medium text-neutral-700 hover:text-black transition-colors cursor-pointer rounded-lg"
-                  >
-                    Log in
-                  </button>
-                  <button
-                    onClick={openSignUp}
-                    className="btn-animate-dark inline-flex items-center justify-center px-4 sm:px-5 py-2 rounded-xl bg-black text-white text-sm font-medium shadow-sm hover:bg-neutral-800 cursor-pointer"
-                  >
-                    <span>Sign Up</span>
-                  </button>
-                </>
+                <Link
+                  href="/signup"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-black px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-neutral-800"
+                >
+                  <span>Get started</span>
+                  <ArrowRight aria-hidden="true" className="h-4 w-4" />
+                </Link>
               )}
             </div>
 
             {/* Mobile Menu Button */}
             <div className="flex md:hidden items-center gap-2">
               {!isAuthenticated ? (
-                <button
-                  onClick={openSignUp}
-                  className="btn-animate-dark px-3.5 py-1.5 rounded-xl bg-black text-white text-xs font-medium cursor-pointer"
+                <Link
+                  href="/signup"
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-black px-3 py-2 text-xs font-medium text-white transition-colors hover:bg-neutral-800"
                 >
-                  Sign Up
-                </button>
+                  <span>Get started</span>
+                  <ArrowRight aria-hidden="true" className="h-3.5 w-3.5" />
+                </Link>
               ) : (
                 <div className="flex items-center gap-1.5 text-xs font-bold text-neutral-800 mr-1">
                   <span className="w-2 h-2 rounded-full bg-lime-500" />
@@ -195,13 +187,9 @@ export function Navbar() {
             {isAuthenticated && user && (
               <div className="p-3 mb-2 rounded-xl bg-white/70 border border-neutral-200/60">
                 <div className="flex items-center gap-2.5">
-                  {user.picture ? (
-                    <img src={user.picture} alt={user.name} className="w-8 h-8 rounded-full object-cover" />
-                  ) : (
-                    <div className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center text-xs font-bold">
-                      {user.name.charAt(0).toUpperCase()}
-                    </div>
-                  )}
+                  <div className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center text-xs font-bold">
+                    {user.name.charAt(0).toUpperCase()}
+                  </div>
                   <div className="truncate">
                     <p className="text-xs font-bold text-black">{user.name}</p>
                     <p className="text-[11px] text-neutral-500 truncate">{user.email}</p>
@@ -253,40 +241,15 @@ export function Navbar() {
               Pricing
             </Link>
 
-            <div className="pt-2 border-t border-neutral-200/40 flex flex-col gap-2">
-              {isAuthenticated ? (
-                <button
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    signOut();
-                  }}
-                  className="w-full text-center py-2.5 rounded-xl bg-red-50 text-red-600 text-sm font-semibold hover:bg-red-100 transition-colors cursor-pointer"
+            {isAuthenticated && (
+              <div className="pt-2 border-t border-neutral-200/40 flex flex-col gap-2">
+                <SignOutForm
+                  className="w-full rounded-xl py-2.5 text-sm"
                 >
                   Sign Out
-                </button>
-              ) : (
-                <>
-                  <button
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      openSignIn();
-                    }}
-                    className="btn-animate w-full text-center py-2.5 rounded-xl text-sm font-medium text-neutral-800 hover:bg-white/60 transition-colors cursor-pointer"
-                  >
-                    Log in
-                  </button>
-                  <button
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      openSignUp();
-                    }}
-                    className="btn-animate-dark w-full text-center py-2.5 rounded-xl bg-black text-white text-sm font-medium hover:bg-neutral-800 transition-colors cursor-pointer"
-                  >
-                    Get Started Free
-                  </button>
-                </>
-              )}
-            </div>
+                </SignOutForm>
+              </div>
+            )}
           </div>
         )}
       </div>

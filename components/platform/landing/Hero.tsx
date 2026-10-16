@@ -3,11 +3,9 @@
 import React from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { useAuth } from "./AuthContext";
 import { HoverLines } from "./HoverWord";
 
 export function Hero() {
-  const { openSignUp } = useAuth();
   return (
     <section className="relative overflow-hidden pt-24 pb-16 sm:pt-28 md:pt-32 md:pb-24">
       {/* Background Soft Pastel Gradient Blobs (Pale Lime & Warm Pastel Peach/Amber) */}
@@ -73,12 +71,12 @@ export function Hero() {
           transition={{ duration: 0.6, delay: 0.3 }}
           className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3.5 sm:gap-4"
         >
-          <button
-            onClick={openSignUp}
+          <Link
+            href="/signup"
             className="btn-animate-dark w-full sm:w-auto inline-flex items-center justify-center px-9 py-3.5 rounded-full bg-black text-white text-base font-semibold shadow-md hover:bg-neutral-900 cursor-pointer"
           >
             <span>Get Started Free</span>
-          </button>
+          </Link>
         </motion.div>
 
         <motion.p

@@ -260,7 +260,7 @@ Restaurant owners need to create and identify their own tenant sites.
 Attached dashboard screenshots.
 
 ## Notes
-Requires `DATABASE_URL` and `AUTH_SECRET`; no migration is needed.
+Requires `DATABASE_URL`; apply `lib/schema.sql` with `npm run db:migrate` when the database schema changes.
 ```
 
 ## 11. Pull Request Review
