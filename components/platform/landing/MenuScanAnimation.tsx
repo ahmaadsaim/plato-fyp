@@ -41,7 +41,7 @@ export function MenuScanAnimation() {
             </h3>
 
             <p className="text-base text-neutral-600 leading-relaxed font-normal">
-              Skip hours of manual spreadsheet data entry. Point any smartphone camera at your printed paper menu. Plato's vision engine instantly reads dish names, prices, descriptions, and modifiers — ready for your register in under two minutes.
+              Skip hours of manual spreadsheet data entry. Point any smartphone camera at your printed paper menu. Plato&apos;s vision engine instantly reads dish names, prices, descriptions, and modifiers — ready for your register in under two minutes.
             </p>
 
             <div className="space-y-3 pt-2">

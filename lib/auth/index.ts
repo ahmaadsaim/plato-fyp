@@ -1,8 +1,8 @@
+import { createHash, randomBytes } from "node:crypto";
 import bcrypt from "bcryptjs";
-import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { queryOne } from "@/lib/db";
+import { pool } from "@/lib/db";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -11,24 +11,16 @@ export interface User {
   name: string;
   email: string;
   created_at: string;
+  provider: "google" | "email";
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const SESSION_COOKIE_NAME = "plato_session";
+const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 7;
 
-const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 7; // 7 days
-
-function getJwtSecret(): Uint8Array {
-  const secret = process.env.AUTH_SECRET;
-
-  if (!secret && process.env.NODE_ENV === "production") {
-    throw new Error("AUTH_SECRET must be configured in production.");
-  }
-
-  return new TextEncoder().encode(
-    secret || "local-development-secret-change-me"
-  );
+function hashSessionToken(token: string): string {
+  return createHash("sha256").update(token).digest("hex");
 }
 
 // ─── Password Helpers ─────────────────────────────────────────────────────────
@@ -50,18 +42,23 @@ export async function createSession(user: {
   id: string;
   name: string;
   email: string;
+  provider?: "google" | "email";
 }) {
-  const token = await new SignJWT({
-    name: user.name,
-    email: user.email,
-  })
-    .setSubject(user.id)
-    .setProtectedHeader({ alg: "HS256" })
-    .setIssuedAt()
-    .setExpirationTime("7d")
-    .sign(getJwtSecret());
-
+  const token = randomBytes(32).toString("base64url");
+  const tokenHash = hashSessionToken(token);
+  const expiresAt = new Date(Date.now() + SESSION_MAX_AGE_SECONDS * 1000);
   const cookieStore = await cookies();
+  const previousToken = cookieStore.get(SESSION_COOKIE_NAME)?.value;
+  await pool.query(
+    "INSERT INTO sessions (user_id, token_hash, expires_at) VALUES ($1, $2, $3)",
+    [user.id, tokenHash, expiresAt]
+  );
+  if (previousToken) {
+    await pool.query(
+      "UPDATE sessions SET revoked_at = NOW() WHERE token_hash = $1 AND revoked_at IS NULL",
+      [hashSessionToken(previousToken)]
+    );
+  }
   cookieStore.set(SESSION_COOKIE_NAME, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
@@ -73,6 +70,17 @@ export async function createSession(user: {
 
 export async function destroySession() {
   const cookieStore = await cookies();
+  const token = cookieStore.get(SESSION_COOKIE_NAME)?.value;
+  if (token) {
+    try {
+      await pool.query(
+        "UPDATE sessions SET revoked_at = NOW() WHERE token_hash = $1 AND revoked_at IS NULL",
+        [hashSessionToken(token)]
+      );
+    } catch (error) {
+      console.error("[destroySession] Could not revoke the server session:", error);
+    }
+  }
   cookieStore.delete(SESSION_COOKIE_NAME);
 }
 
@@ -85,29 +93,31 @@ export async function getSessionUser(): Promise<User | null> {
   if (!token) return null;
 
   try {
-    const { payload } = await jwtVerify(token, getJwtSecret(), {
-      algorithms: ["HS256"],
-    });
-    const userId = payload.sub;
-    if (!userId) return null;
-
-    try {
-      const dbUser = await queryOne<User>(
-        "SELECT id, name, email, created_at FROM users WHERE id = $1",
-        [userId]
-      );
-      if (dbUser) return dbUser;
-    } catch {
-      // Fallback to JWT payload if database is offline
-    }
-
+    const result = await pool.query<{
+      id: string;
+      name: string;
+      email: string;
+      created_at: string;
+      google_sub: string | null;
+    }>(
+      `SELECT u.id, u.name, u.email, u.created_at, u.google_sub
+       FROM sessions s
+       JOIN users u ON u.id = s.user_id
+       WHERE s.token_hash = $1 AND s.revoked_at IS NULL AND s.expires_at > NOW()
+       LIMIT 1`,
+      [hashSessionToken(token)]
+    );
+    const dbUser = result.rows[0];
+    if (!dbUser) return null;
     return {
-      id: userId,
-      name: (payload.name as string) || "Merchant Admin",
-      email: (payload.email as string) || "admin@plato.local",
-      created_at: new Date().toISOString(),
+      id: dbUser.id,
+      name: dbUser.name,
+      email: dbUser.email,
+      created_at: dbUser.created_at,
+      provider: dbUser.google_sub ? "google" : "email",
     };
   } catch {
+    // Authentication fails closed if the session store is unavailable.
     return null;
   }
 }
@@ -121,7 +131,7 @@ export async function requireUser(): Promise<User> {
   return user;
 }
 
-/** Verifies user password against database hash or fallback credentials. */
+/** Verifies a user's password against the persisted password hash. */
 export async function verifyUserPassword(
   userId: string,
   email: string,
@@ -130,27 +140,14 @@ export async function verifyUserPassword(
   if (!passwordAttempt) return false;
 
   try {
-    const user = await queryOne<{ password_hash: string }>(
-      "SELECT password_hash FROM users WHERE id = $1 OR email = $2",
+    const result = await pool.query<{ password_hash: string | null }>(
+      "SELECT password_hash FROM users WHERE id = $1 AND email = $2",
       [userId, email.toLowerCase()]
     );
-    if (user && user.password_hash) {
-      const isMatch = await verifyPassword(passwordAttempt, user.password_hash);
-      if (isMatch) return true;
-    }
-  } catch (err) {
-    console.warn("[verifyUserPassword] DB query warning:", err);
+    const passwordHash = result.rows[0]?.password_hash;
+    return passwordHash ? verifyPassword(passwordAttempt, passwordHash) : false;
+  } catch {
+    return false;
   }
-
-  // Fast fallback for local demo sessions / dev without DB
-  if (
-    passwordAttempt === "plato123" ||
-    passwordAttempt === "password123" ||
-    passwordAttempt === "admin123"
-  ) {
-    return true;
-  }
-
-  return false;
 }
 

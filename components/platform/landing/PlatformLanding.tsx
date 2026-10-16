@@ -3,7 +3,6 @@
 import React from "react";
 import { User as AuthUser } from "@/lib/auth";
 import { AuthProvider } from "./AuthContext";
-import { AuthModal } from "./AuthModal";
 import { Navbar } from "./Navbar";
 import { Hero } from "./Hero";
 import { SystemMockup } from "./SystemMockup";
@@ -26,7 +25,7 @@ export function PlatformLanding({ user }: PlatformLandingProps) {
     ? {
         name: user.name,
         email: user.email,
-        provider: "email" as const,
+        provider: user.provider,
       }
     : null;
 
@@ -47,7 +46,6 @@ export function PlatformLanding({ user }: PlatformLandingProps) {
           <RecapAndCta />
         </main>
         <Footer />
-        <AuthModal />
       </div>
     </AuthProvider>
   );

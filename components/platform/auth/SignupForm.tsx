@@ -1,96 +1,89 @@
 "use client";
 
-import React, { useActionState } from "react";
+import { useActionState } from "react";
 import Link from "next/link";
 import { signupAction, AuthState } from "@/app/actions/auth";
+import { GoogleAuthControls } from "./GoogleAuthControls";
 
 const initialState: AuthState = {};
 
-export function SignupForm() {
+export function SignupForm({ googleError }: { googleError?: string }) {
   const [state, formAction, isPending] = useActionState(signupAction, initialState);
 
   return (
-    <main className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col items-center justify-center p-6 font-sans">
-      <div className="w-full max-w-sm space-y-6">
-        <div className="text-center space-y-2">
-          <Link
-            href="/"
-            className="text-3xl inline-block hover:opacity-80 transition-opacity cursor-pointer"
-          >
-            🍽️
-          </Link>
-          <h1 className="text-2xl font-bold tracking-tight text-white">Create Account</h1>
-          <p className="text-xs text-zinc-400">Join the Restaurant Platform</p>
-        </div>
+    <main className="flex min-h-screen items-center justify-center bg-zinc-50 px-5 py-12 text-zinc-900">
+      <section aria-labelledby="signup-title" className="w-full max-w-sm space-y-6 rounded-2xl border border-zinc-200 bg-white p-7 shadow-sm">
+        <header className="space-y-2 text-center">
+          <h1 id="signup-title" className="text-2xl font-semibold tracking-tight">Create your account</h1>
+          <p className="text-sm text-zinc-500">Set up your store workspace.</p>
+        </header>
+        <GoogleAuthControls intent="signup" error={googleError} />
 
         <form action={formAction} className="space-y-4">
           {state?.error && (
-            <div className="p-3 text-xs rounded-lg bg-red-950/60 border border-red-800 text-red-300">
+            <p role="alert" className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
               {state.error}
-            </div>
+            </p>
           )}
 
-          <div>
-            <label className="block text-xs font-medium text-zinc-300 mb-1" htmlFor="name">
-              Name
-            </label>
+          <label className="block space-y-1.5 text-sm font-medium text-zinc-700" htmlFor="name">
+            Name
             <input
               id="name"
               name="name"
               type="text"
               required
+              minLength={2}
+              maxLength={80}
               autoComplete="name"
-              placeholder="e.g. Saim"
-              className="w-full px-3 py-2 rounded-lg bg-zinc-900 border border-zinc-800 text-white placeholder-zinc-500 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-600"
+              placeholder="Your name"
+              className="w-full rounded-lg border border-zinc-300 bg-white px-3.5 py-2.5 text-sm text-zinc-900 outline-none transition focus:border-zinc-500 focus:ring-2 focus:ring-zinc-200"
             />
-          </div>
+          </label>
 
-          <div>
-            <label className="block text-xs font-medium text-zinc-300 mb-1" htmlFor="email">
-              Email
-            </label>
+          <label className="block space-y-1.5 text-sm font-medium text-zinc-700" htmlFor="email">
+            Email
             <input
               id="email"
               name="email"
               type="email"
               required
               autoComplete="email"
-              placeholder="saim@example.com"
-              className="w-full px-3 py-2 rounded-lg bg-zinc-900 border border-zinc-800 text-white placeholder-zinc-500 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-600"
+              placeholder="you@example.com"
+              className="w-full rounded-lg border border-zinc-300 bg-white px-3.5 py-2.5 text-sm text-zinc-900 outline-none transition focus:border-zinc-500 focus:ring-2 focus:ring-zinc-200"
             />
-          </div>
+          </label>
 
-          <div>
-            <label className="block text-xs font-medium text-zinc-300 mb-1" htmlFor="password">
-              Password
-            </label>
+          <label className="block space-y-1.5 text-sm font-medium text-zinc-700" htmlFor="password">
+            Password
             <input
               id="password"
               name="password"
               type="password"
               required
+              minLength={8}
               autoComplete="new-password"
-              placeholder="••••••••"
-              className="w-full px-3 py-2 rounded-lg bg-zinc-900 border border-zinc-800 text-white placeholder-zinc-500 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-600"
+              placeholder="At least 8 characters"
+              className="w-full rounded-lg border border-zinc-300 bg-white px-3.5 py-2.5 text-sm text-zinc-900 outline-none transition focus:border-zinc-500 focus:ring-2 focus:ring-zinc-200"
             />
-          </div>
+          </label>
 
           <button
             type="submit"
             disabled={isPending}
-            className="w-full py-2.5 px-4 rounded-lg bg-white text-zinc-950 font-semibold text-sm hover:bg-zinc-200 transition-colors disabled:opacity-50 cursor-pointer"
+            className="w-full rounded-lg bg-zinc-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-zinc-700 disabled:cursor-wait disabled:opacity-60"
           >
-            {isPending ? "Creating account..." : "Sign Up"}
+            {isPending ? "Creating account…" : "Create account"}
           </button>
         </form>
 
-        <p className="text-center text-xs text-zinc-400">
+        <p className="text-center text-sm text-zinc-500">
           Already have an account?{" "}
-          <Link href="/login" className="text-white hover:underline font-medium cursor-pointer">
+          <Link href="/login" className="font-medium text-zinc-900 underline-offset-4 hover:underline">
             Log in
           </Link>
         </p>
-      </div>
+      </section>
     </main>
   );
 }

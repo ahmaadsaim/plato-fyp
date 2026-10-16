@@ -6,83 +6,93 @@ The application is built with Next.js, React, TypeScript, and PostgreSQL. Themes
 
 ## Requirements
 
-- Node.js 20.9 or newer
-- npm
-- PostgreSQL 14 or newer, running locally or hosted
+- Node.js 20.9 or newer and npm
+- PostgreSQL 14 or newer (local or hosted)
 
-## Initialize locally
-
-Clone the repository and install dependencies:
+## Quick start
 
 ```bash
 git clone https://github.com/ahmaadsaim/plato-fyp.git
-cd fyp-plato
-npm install
+cd plato-fyp
+npm ci
+cp .env.example .env.local
 ```
 
-Create `.env.local` in the project root:
-
-```env
-# PostgreSQL connection string used by the pg client
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/plato
-
-# Use a long random value in every shared or production environment
-AUTH_SECRET=replace-with-a-long-random-secret
-
-# Local tenant URLs are http://<slug>.localhost:3000
-# In production, set this to the platform domain without https://
-PLATFORM_DOMAIN=localhost:3000
-```
-
-`.env.local` is ignored by Git. Never commit database credentials or production secrets.
-
-## Initialize the database
-
-Create a PostgreSQL database named `plato` if it does not already exist:
+Edit `.env.local` (or `.env`) and set `DATABASE_URL`. The example config targets a local PostgreSQL database named `plato`. Create it if needed with `createdb plato`, then run the repeatable schema migration:
 
 ```bash
-createdb plato
-```
-
-Apply the schema:
-
-```bash
-psql "$DATABASE_URL" -f lib/schema.sql
-```
-
-If your shell does not load `.env.local` automatically, provide the connection string directly:
-
-```bash
-psql "postgresql://postgres:postgres@localhost:5432/plato" -f lib/schema.sql
-```
-
-The schema creates the `users` and `tenants` tables and the indexes required for tenant lookup. The application creates user and tenant records through its server actions; no seed script is required for a fresh install.
-
-## Run the application
-
-Start the development server:
-
-```bash
+npm run db:migrate
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). Useful routes are:
+Open [http://localhost:3000](http://localhost:3000). `.env.local` and `.env` are ignored by Git; do not commit database credentials or OAuth secrets. The migration command reads `.env.local` first, then `.env`, and respects environment variables already set by the shell or deployment platform.
 
-- `/` for the platform home page.
-- `/signup` and `/login` for authentication.
-- `/dashboard` for creating and viewing restaurants.
-- `/demo` for the theme gallery.
+### Environment variables
 
-After creating a restaurant with the slug `pizza-house`, open `http://pizza-house.localhost:3000`. Modern browsers resolve `*.localhost` to the local machine. If this does not work in your environment, use the request host override supported by the development setup or add the hostname to `/etc/hosts`.
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `DATABASE_URL` | Yes | PostgreSQL connection string. |
+| `PLATFORM_DOMAIN` | Yes for tenant domains | Platform hostname without a protocol (local: `localhost:3000`). |
+| `APP_URL` | For Google sign-in | Canonical app origin, e.g. `http://localhost:3000` or `https://platform.example.com`; must match the browser origin. |
+| `GOOGLE_CLIENT_ID` | For Google sign-in | Google Cloud OAuth **Web application** client ID. |
+| `GOOGLE_CLIENT_SECRET` | For Google sign-in | Server-only OAuth client secret. Never expose it with a `NEXT_PUBLIC_` variable. |
 
-## Commands
+`GOOGLE_REDIRECT_URI` and `AUTH_SECRET` are not used by this implementation. The callback URI is derived from `APP_URL` and is always `/api/auth/google/callback`.
+
+## Google sign-in setup
+
+1. In [Google Cloud Console](https://console.cloud.google.com/), choose a project and configure the OAuth consent screen (app name, audience, support email, and contact details). If the audience is **External** and the app is in **Testing**, add each tester's Google account.
+2. Create an OAuth client ID with application type **Web application**.
+3. Under **Authorized redirect URIs**, add the exact callback URL:
+   - Local development: `http://localhost:3000/api/auth/google/callback`
+   - Production: `https://YOUR_PLATFORM_HOST/api/auth/google/callback`
+4. If prompted, add corresponding **Authorized JavaScript origins**: `http://localhost:3000` and `https://YOUR_PLATFORM_HOST`. Origins have no path. Do not add tenant subdomains; OAuth returns to the platform host.
+5. Copy the client ID and secret into `.env.local` for local work, or the hosting provider's secret manager for production. Set `APP_URL` to the matching origin. Do not commit secrets. Restart the development server after changing environment values.
+6. Allow a few minutes for Google Console changes to propagate. The redirect URI must match exactly (scheme, host, port, path, and trailing slash).
+
+The app uses a server-side authorization-code flow with PKCE, state, and OIDC nonce validation. Google identity is verified on the server; only verified email claims are accepted. If a verified Google email matches an existing password account, Google login links the identity and signs in to that same account. Google signup creates a passwordless account when no matching account exists. Google sign-in requires a reachable database and the schema migration below.
+
+### Google OAuth troubleshooting
+
+- `redirect_uri_mismatch`: inspect the `redirect_uri` parameter in Google's error details and add that exact URL under **Authorized redirect URIs**. For local setup it should be `http://localhost:3000/api/auth/google/callback`. Check that `APP_URL` has no extra path or trailing slash.
+- `access_denied` / app unavailable to test users: add the account under the OAuth consent screen's test users, or publish/verify the consent screen as appropriate.
+- Generic sign-in failure: check the Next.js server terminal for `[Google OAuth]` diagnostics. Never paste authorization codes, cookies, client secrets, or full token responses into issue reports.
+- Google sign-in not configured: verify `APP_URL`, `GOOGLE_CLIENT_ID`, and `GOOGLE_CLIENT_SECRET` are present in the server environment; do not prefix the secret with `NEXT_PUBLIC_`.
+
+## Database and migrations
+
+The authoritative schema is `lib/schema.sql`. It creates/updates users, tenants, theme overrides, and opaque revocable sessions. The migration is safe to rerun and is required both on a fresh database and when upgrading an existing installation.
+
+1. Create the PostgreSQL database (for example, `createdb plato`) and set `DATABASE_URL` in `.env.local` or the deployment environment.
+2. Apply all schema changes using `npm run db:migrate`. The script loads `.env.local` or `.env` automatically for local development; deployment environments should inject `DATABASE_URL` as a secret/environment variable.
+3. Back up production data before deploying a schema change. Apply the migration once as a deployment/release step before serving code that depends on the new schema. Check that the command reports `Database migration complete`.
+4. If connection details change, update the environment and rerun the command. Do not manually edit production tables to match local assumptions.
+
+The migration adds nullable password hashes (for Google-only accounts), a unique Google subject, and the `sessions` table. The app does not seed demo credentials; registration creates real database-backed accounts.
+
+## Accounts, sessions, and access
+
+- Register at `/signup` with name, email, and password, or use Google signup. Sign in at `/login` with email/password or a previously linked Google account.
+- A password account with a matching Google-verified email is connected automatically at Google login; the same user record and dashboard data are retained. Email by itself is never trusted unless Google marks it verified.
+- Sessions are random seven-day tokens in an `HttpOnly`, `SameSite=Lax` cookie. Only a SHA-256 token hash is stored in PostgreSQL. Login rotates sessions, logout revokes the server session, and protected dashboard routes require an active database session.
+- If PostgreSQL is down, login/session validation fails closed. Restore the DB connection before authenticating; no demo or localStorage fallback is provided.
+
+## Useful commands and routes
 
 ```bash
-npm run dev       # Start the development server
-npm run lint      # Run ESLint
-npm run build     # Create a production build
-npm run start     # Serve the production build
+npm run dev        # Start local development server
+npm run db:migrate # Apply the PostgreSQL schema (loads .env.local/.env)
+npm run lint       # Run ESLint
+npm run build      # Create a production build
+npm run start      # Serve the production build
 ```
+
+- `/` — platform landing page (or tenant storefront on a tenant host)
+- `/signup` and `/login` — account creation and sign-in
+- `/dashboard` — authenticated restaurant dashboard
+- `/demo` — theme gallery
+
+Tenant hostnames use `http://<slug>.localhost:3000` in local development. For production, configure wildcard DNS and hosting for `*.your-domain` and set `PLATFORM_DOMAIN` to the platform hostname.
 
 ## Project structure
 
@@ -121,7 +131,7 @@ Set `PLATFORM_DOMAIN` to the public platform hostname without a protocol, for ex
 PLATFORM_DOMAIN=localhost:3000
 ```
 
-Tenant URLs then use `https://<slug>.plato.example.com`. Configure the matching wildcard DNS record and wildcard domain in your hosting provider so `*.plato.example.com` routes to this application. Use a strong production `AUTH_SECRET` and a managed PostgreSQL connection string in the deployment environment.
+Tenant URLs then use `https://<slug>.plato.example.com`. Configure the matching wildcard DNS record and wildcard domain in your hosting provider so `*.plato.example.com` routes to this application. Use a managed PostgreSQL connection string and keep Google OAuth credentials in the deployment secret manager. Set `APP_URL` to the platform's canonical HTTPS origin.
 
 ## AI agent initialization prompt
 
@@ -136,12 +146,9 @@ Work in the repository root and follow the existing codebase conventions. Do not
 2. Confirm Node.js 20.9+ and npm are available, then run npm install.
 3. Create .env.local if it is missing with:
    DATABASE_URL=postgresql://postgres:postgres@localhost:5432/plato
-   AUTH_SECRET=<generate a long random local secret>
    PLATFORM_DOMAIN=localhost:3000
    Do not commit .env.local or print secrets in the final response.
-4. Confirm PostgreSQL is available. Create the plato database if needed, then apply the schema with:
-   psql "$DATABASE_URL" -f lib/schema.sql
-   If DATABASE_URL is not exported by the shell, read the value from .env.local without exposing it and run the equivalent psql command.
+4. Confirm PostgreSQL is available. Create the plato database if needed, then apply the schema with `npm run db:migrate`. The script reads `.env.local` and reports success or failure.
 5. Run npm run lint and fix only errors caused by initialization. Do not make unrelated refactors.
 6. Start the app with npm run dev and verify that the platform home page, /signup, /login, /dashboard, and /demo respond correctly.
 7. Report the exact initialization steps completed, any prerequisite that needs manual action, and the local URL. Never claim the database was initialized unless the schema command succeeded.
