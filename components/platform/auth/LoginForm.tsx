@@ -15,7 +15,7 @@ export function LoginForm({ googleError }: { googleError?: string }) {
       <section aria-labelledby="login-title" className="w-full max-w-sm space-y-6 rounded-2xl border border-zinc-200 bg-white p-7 shadow-sm">
         <header className="space-y-2 text-center">
           <h1 id="login-title" className="text-2xl font-semibold tracking-tight">Log in</h1>
-          <p className="text-sm text-zinc-500">Access your store dashboard.</p>
+          <p className="text-sm text-zinc-500">Welcome back to plato.</p>
         </header>
         <GoogleAuthControls intent="login" error={googleError} />
 

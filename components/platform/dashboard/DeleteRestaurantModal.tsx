@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import type { Tenant } from "@/lib/tenant";
 import { deleteTenantAction } from "@/app/actions/tenant";
+import { TextureButton } from "@/components/ui/texture-button";
 
 interface DeleteRestaurantModalProps {
   tenant: Tenant;
@@ -139,14 +140,15 @@ export function DeleteRestaurantModal({
             >
               Cancel
             </button>
-            <button
+            <TextureButton
               type="submit"
+              variant="destructive"
+              size="sm"
               disabled={isPending || !password.trim()}
-              className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold text-xs transition-colors flex items-center gap-1.5 disabled:opacity-50 cursor-pointer shadow-xs"
             >
               <Trash2 className="w-3.5 h-3.5" />
               <span>{isPending ? "Verifying & Deleting..." : "Confirm Deletion"}</span>
-            </button>
+            </TextureButton>
           </div>
         </form>
       </div>
