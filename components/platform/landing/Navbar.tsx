@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   UtensilsCrossed,
   Menu,
@@ -9,15 +10,17 @@ import {
   LogOut,
   LayoutDashboard,
   ChevronDown,
+  ArrowRight,
 } from "lucide-react";
 import { useAuth } from "./AuthContext";
-import { logoutAction } from "@/app/actions/auth";
+import { SignOutForm } from "@/components/platform/auth/SignOutForm";
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   const { user, isAuthenticated } = useAuth();
 
@@ -28,6 +31,14 @@ export function Navbar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    const refreshRestoredPage = (event: PageTransitionEvent) => {
+      if (event.persisted) router.refresh();
+    };
+    window.addEventListener("pageshow", refreshRestoredPage);
+    return () => window.removeEventListener("pageshow", refreshRestoredPage);
+  }, [router]);
 
   // Close user dropdown on click outside
   useEffect(() => {
@@ -106,9 +117,7 @@ export function Navbar() {
                         <p className="text-xs font-bold text-neutral-900 truncate">{user.name}</p>
                         <p className="text-[11px] text-neutral-500 truncate">{user.email}</p>
                         <div className="mt-1 flex items-center gap-1 text-[10px] text-lime-700 font-semibold">
-                          <span className="w-1.5 h-1.5 rounded-full bg-lime-500" />
-                          <span>{user.provider === "google" ? "Google Connected" : "Email Account"}</span>
-                        </div>
+                          </div>
                       </div>
 
                       <div className="py-1">
@@ -123,35 +132,25 @@ export function Navbar() {
                       </div>
 
                       <div className="pt-1 border-t border-neutral-100">
-                        <form action={logoutAction}>
-                          <button
-                            type="submit"
-                            onClick={() => setUserDropdownOpen(false)}
-                            className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
-                          >
-                            <LogOut className="w-3.5 h-3.5" />
-                            <span>Sign Out</span>
-                          </button>
-                        </form>
+                        <SignOutForm
+                          size="sm"
+                          className="w-full justify-start rounded-xl px-3 py-2 text-xs font-medium"
+                        >
+                          <LogOut className="w-3.5 h-3.5" />
+                          <span>Sign Out</span>
+                        </SignOutForm>
                       </div>
                     </div>
                   )}
                 </div>
               ) : (
-                <>
-                  <Link
-                    href="/login"
-                    className="btn-animate px-3.5 py-1.5 text-sm font-medium text-neutral-700 hover:text-black transition-colors cursor-pointer rounded-lg"
-                  >
-                    Log in
-                  </Link>
-                  <Link
-                    href="/signup"
-                    className="btn-animate-dark inline-flex items-center justify-center px-4 sm:px-5 py-2 rounded-xl bg-black text-white text-sm font-medium shadow-sm hover:bg-neutral-800 cursor-pointer"
-                  >
-                    <span>Sign Up</span>
-                  </Link>
-                </>
+                <Link
+                  href="/signup"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-black px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-neutral-800"
+                >
+                  <span>Get started</span>
+                  <ArrowRight aria-hidden="true" className="h-4 w-4" />
+                </Link>
               )}
             </div>
 
@@ -160,9 +159,10 @@ export function Navbar() {
               {!isAuthenticated ? (
                 <Link
                   href="/signup"
-                  className="btn-animate-dark px-3.5 py-1.5 rounded-xl bg-black text-white text-xs font-medium cursor-pointer"
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-black px-3 py-2 text-xs font-medium text-white transition-colors hover:bg-neutral-800"
                 >
-                  Sign Up
+                  <span>Get started</span>
+                  <ArrowRight aria-hidden="true" className="h-3.5 w-3.5" />
                 </Link>
               ) : (
                 <div className="flex items-center gap-1.5 text-xs font-bold text-neutral-800 mr-1">
@@ -241,35 +241,15 @@ export function Navbar() {
               Pricing
             </Link>
 
-            <div className="pt-2 border-t border-neutral-200/40 flex flex-col gap-2">
-              {isAuthenticated ? (
-                <form action={logoutAction}>
-                  <button
-                    type="submit"
-                    className="w-full text-center py-2.5 rounded-xl bg-red-50 text-red-600 text-sm font-semibold hover:bg-red-100 transition-colors cursor-pointer"
-                  >
-                    Sign Out
-                  </button>
-                </form>
-              ) : (
-                <>
-                  <Link
-                    href="/login"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="btn-animate w-full text-center py-2.5 rounded-xl text-sm font-medium text-neutral-800 hover:bg-white/60 transition-colors cursor-pointer"
-                  >
-                    Log in
-                  </Link>
-                  <Link
-                    href="/signup"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="btn-animate-dark w-full text-center py-2.5 rounded-xl bg-black text-white text-sm font-medium hover:bg-neutral-800 transition-colors cursor-pointer"
-                  >
-                    Get Started Free
-                  </Link>
-                </>
-              )}
-            </div>
+            {isAuthenticated && (
+              <div className="pt-2 border-t border-neutral-200/40 flex flex-col gap-2">
+                <SignOutForm
+                  className="w-full rounded-xl py-2.5 text-sm"
+                >
+                  Sign Out
+                </SignOutForm>
+              </div>
+            )}
           </div>
         )}
       </div>

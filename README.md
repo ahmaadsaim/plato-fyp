@@ -138,20 +138,15 @@ Tenant URLs then use `https://<slug>.plato.example.com`. Configure the matching 
 The code block below is intentionally self-contained. Use the code block's **Copy** button in GitHub or VS Code, then give the prompt to your coding agent to initialize a fresh local checkout:
 
 ```text
-You are initializing the PLATO repository, the official multi-tenant restaurant platform.
+You are setting up and running PLATO, a multi-tenant restaurant platform. Work from the repository root and follow the repository's current instructions and code conventions. Preserve existing application code and local configuration; do not create duplicate abstractions or make unrelated changes.
 
-Work in the repository root and follow the existing codebase conventions. Do not replace working application code or create duplicate database abstractions.
-
-1. Inspect package.json, README.md, lib/db/index.ts, lib/schema.sql, and the app routes before making changes.
-2. Confirm Node.js 20.9+ and npm are available, then run npm install.
-3. Create .env.local if it is missing with:
-   DATABASE_URL=postgresql://postgres:postgres@localhost:5432/plato
-   PLATFORM_DOMAIN=localhost:3000
-   Do not commit .env.local or print secrets in the final response.
-4. Confirm PostgreSQL is available. Create the plato database if needed, then apply the schema with `npm run db:migrate`. The script reads `.env.local` and reports success or failure.
-5. Run npm run lint and fix only errors caused by initialization. Do not make unrelated refactors.
-6. Start the app with npm run dev and verify that the platform home page, /signup, /login, /dashboard, and /demo respond correctly.
-7. Report the exact initialization steps completed, any prerequisite that needs manual action, and the local URL. Never claim the database was initialized unless the schema command succeeded.
+1. Inspect `AGENTS.md`, `README.md`, `package.json`, the lockfile, `lib/db/index.ts`, `lib/schema.sql`, `scripts/migrate-db.mjs`, and the relevant routes. Follow any framework-specific instructions in `AGENTS.md` before changing application code.
+2. Check that Node.js 20.9+ and npm are available. Install dependencies with `npm ci` when `package-lock.json` exists; otherwise use `npm install`.
+3. If `.env.local` already exists, preserve it. If it is missing, copy `.env.example` to `.env.local`. Ensure `DATABASE_URL` points to a development database and `PLATFORM_DOMAIN=localhost:3000`. Do not overwrite real values with the example placeholders. Google OAuth is optional for basic local startup; only set `APP_URL`, `GOOGLE_CLIENT_ID`, and `GOOGLE_CLIENT_SECRET` when valid credentials are available. Never print or commit `.env`, `.env.local`, database URLs, OAuth secrets, cookies, or tokens.
+4. Before running a migration, verify without displaying credentials that `DATABASE_URL` targets a local development database. Never migrate a remote or production database unless the user explicitly approves it. For a local database, check that PostgreSQL is available and create the configured database only if it is missing and the local PostgreSQL permissions allow it. Then run `npm run db:migrate`; this applies the repeatable schema in `lib/schema.sql`. If any prerequisite is unavailable, report the exact blocker instead of claiming the migration succeeded.
+5. Run `npm run lint` and `npm run build`. Fix only issues introduced by setup or your changes; report pre-existing failures without making unrelated refactors.
+6. Check whether port 3000 is already in use before starting another server. If it is free, start `npm run dev`, leave the server running, and verify `http://localhost:3000/`, `/signup`, `/login`, `/dashboard`, and `/demo` respond. Do not claim routes were verified unless you actually checked them. Google sign-in can only be fully tested when valid OAuth credentials and matching Google Cloud redirect settings are configured.
+7. Report the commands completed, whether the local schema migration succeeded, any remaining manual prerequisites, and the local URL. Do not include secret values in the report.
 ```
 
 ## Contributing

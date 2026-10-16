@@ -1,8 +1,14 @@
 import { timingSafeEqual } from "node:crypto";
 import { OAuth2Client } from "google-auth-library";
+import { revalidatePath } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { createSession } from "@/lib/auth";
 import { pool } from "@/lib/db";
+import {
+  createGoogleRegistrationTicket,
+  GOOGLE_REGISTRATION_COOKIE,
+  GOOGLE_REGISTRATION_MAX_AGE,
+} from "@/lib/auth/google-registration";
 
 const CALLBACK_PATH = "/api/auth/google/callback";
 
@@ -31,6 +37,7 @@ function clearOAuthCookies(response: NextResponse) {
   response.cookies.delete({ name: "google_oauth_verifier", path: CALLBACK_PATH });
   response.cookies.delete({ name: "google_oauth_nonce", path: CALLBACK_PATH });
   response.cookies.delete({ name: "google_oauth_intent", path: CALLBACK_PATH });
+  response.cookies.delete({ name: GOOGLE_REGISTRATION_COOKIE, path: "/signup" });
   return response;
 }
 
@@ -180,27 +187,37 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    if (!existingUser && intent === "login") {
-      return clearOAuthCookies(redirectToAuth(baseUrl, intent, "google_account_not_found"));
+    if (!existingUser) {
+      const registrationTicket = createGoogleRegistrationTicket({
+        name: profile.name?.trim() || email,
+        email,
+        subject: profile.sub,
+      });
+      const response = clearOAuthCookies(
+        NextResponse.redirect(new URL("/signup?google=1", baseUrl))
+      );
+      response.cookies.set(GOOGLE_REGISTRATION_COOKIE, registrationTicket, {
+        httpOnly: true,
+        secure: baseUrl.startsWith("https://"),
+        sameSite: "lax",
+        maxAge: GOOGLE_REGISTRATION_MAX_AGE,
+        path: "/signup",
+      });
+      return response;
     }
 
-    const user = existingUser ?? (
-      await pool.query<{ id: string; name: string; email: string }>(
-        "INSERT INTO users (name, email, password_hash, google_sub) VALUES ($1, $2, NULL, $3) RETURNING id, name, email",
-        [profile.name?.trim() || email, email, profile.sub]
-      )
-    ).rows[0];
-
-    if (!user) throw new Error("Could not persist Google account");
     failureStage = "application session creation";
     await createSession({
-      id: user.id,
-      name: user.name,
-      email: user.email,
+      id: existingUser.id,
+      name: existingUser.name,
+      email: existingUser.email,
       provider: "google",
     });
+    revalidatePath("/");
 
-    return clearOAuthCookies(NextResponse.redirect(new URL("/dashboard", baseUrl)));
+    return clearOAuthCookies(
+      NextResponse.redirect(new URL("/auth/processing/google", baseUrl))
+    );
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
     console.error(`[Google OAuth] Callback failed during ${failureStage}: ${message}`);

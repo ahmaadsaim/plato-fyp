@@ -7,7 +7,7 @@ import type {
 } from "react";
 
 type TextureButtonVariant = "primary" | "accent" | "secondary" | "destructive" | "minimal" | "icon";
-type TextureButtonSize = "sm" | "default" | "lg" | "icon";
+type TextureButtonSize = "sm" | "default" | "lg" | "icon" | "icon-sm";
 
 interface TextureButtonBaseProps {
   variant?: TextureButtonVariant;
@@ -49,6 +49,7 @@ const sizeClasses: Record<TextureButtonSize, string> = {
   default: "min-h-11 px-5 text-sm",
   lg: "min-h-12 px-7 text-base",
   icon: "h-10 w-10 p-0",
+  "icon-sm": "h-8 w-8 p-0",
 };
 
 export function TextureButton({

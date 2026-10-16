@@ -4,70 +4,87 @@ import { useActionState } from "react";
 import Link from "next/link";
 import { loginAction, AuthState } from "@/app/actions/auth";
 import { GoogleAuthControls } from "./GoogleAuthControls";
+import { AuthField } from "./AuthField";
+import { AuthCard } from "./AuthCard";
+import { TextureButton } from "@/components/ui/texture-button";
+import { ProcessingScreen } from "@/components/ui/ProcessingScreen";
 
 const initialState: AuthState = {};
 
-export function LoginForm({ googleError }: { googleError?: string }) {
+export function LoginForm({
+  googleError,
+  initialEmail,
+}: {
+  googleError?: string;
+  initialEmail?: string;
+}) {
   const [state, formAction, isPending] = useActionState(loginAction, initialState);
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-zinc-50 px-5 py-12 text-zinc-900">
-      <section aria-labelledby="login-title" className="w-full max-w-sm space-y-6 rounded-2xl border border-zinc-200 bg-white p-7 shadow-sm">
-        <header className="space-y-2 text-center">
-          <h1 id="login-title" className="text-2xl font-semibold tracking-tight">Log in</h1>
-          <p className="text-sm text-zinc-500">Welcome back to plato.</p>
-        </header>
+    <AuthCard
+      labelledBy="login-title"
+      title="Welcome back"
+      description="Log in to manage your stores and keep your business moving."
+    >
+        {isPending && (
+          <ProcessingScreen
+            variant="overlay"
+            title="Signing you in"
+            description="We’re securely connecting you to your Plato workspace."
+          />
+        )}
+        {googleError === "account_exists" && (
+          <p role="status" className="rounded-xl border border-amber-300/20 bg-amber-300/10 p-3 text-sm text-amber-100">
+            An account already uses this email. Log in to continue.
+          </p>
+        )}
         <GoogleAuthControls intent="login" error={googleError} />
 
-        <form action={formAction} className="space-y-4">
+        <form action={formAction} className="space-y-5" aria-busy={isPending}>
           {state?.error && (
-            <p role="alert" className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+            <p role="alert" className="rounded-xl border border-rose-400/20 bg-rose-400/10 p-3 text-sm text-rose-200">
               {state.error}
             </p>
           )}
 
-          <label className="block space-y-1.5 text-sm font-medium text-zinc-700" htmlFor="email">
-            Email
-            <input
-              id="email"
-              name="email"
-              type="email"
-              required
-              autoComplete="email"
-              placeholder="you@example.com"
-              className="w-full rounded-lg border border-zinc-300 bg-white px-3.5 py-2.5 text-sm text-zinc-900 outline-none transition focus:border-zinc-500 focus:ring-2 focus:ring-zinc-200"
-            />
-          </label>
+          <AuthField
+            id="email"
+            name="email"
+            label="Email address"
+            type="email"
+            required
+            defaultValue={initialEmail}
+            autoComplete="email"
+            placeholder="you@example.com"
+          />
 
-          <label className="block space-y-1.5 text-sm font-medium text-zinc-700" htmlFor="password">
-            Password
-            <input
-              id="password"
-              name="password"
-              type="password"
-              required
-              autoComplete="current-password"
-              placeholder="••••••••"
-              className="w-full rounded-lg border border-zinc-300 bg-white px-3.5 py-2.5 text-sm text-zinc-900 outline-none transition focus:border-zinc-500 focus:ring-2 focus:ring-zinc-200"
-            />
-          </label>
+          <AuthField
+            id="password"
+            name="password"
+            label="Password"
+            type="password"
+            required
+            autoComplete="current-password"
+            placeholder="Enter your password"
+          />
 
-          <button
+          <TextureButton
             type="submit"
             disabled={isPending}
-            className="w-full rounded-lg bg-zinc-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-zinc-700 disabled:cursor-wait disabled:opacity-60"
+            aria-busy={isPending}
+            className="w-full rounded-xl"
+            size="lg"
           >
-            {isPending ? "Logging in…" : "Log in"}
-          </button>
+            <span>{isPending ? "Signing you in…" : "Log in"}</span>
+          </TextureButton>
         </form>
 
-        <p className="text-center text-sm text-zinc-500">
+        <p className="border-t border-white/10 pt-5 text-center text-sm text-zinc-400">
           New to Plato?{" "}
-          <Link href="/signup" className="font-medium text-zinc-900 underline-offset-4 hover:underline">
+          <Link href="/signup" className="font-semibold text-white underline-offset-4 hover:underline">
             Create an account
           </Link>
         </p>
-      </section>
-    </main>
+    </AuthCard>
   );
 }

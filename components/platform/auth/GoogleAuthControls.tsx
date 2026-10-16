@@ -4,7 +4,8 @@ const messages: Record<string, string> = {
   google_database_failed: "Google sign-in could not save your account. Check the database connection and run the database migration.",
   google_session_failed: "Google verified your account, but we could not create your app session. Check PostgreSQL and run npm run db:migrate.",
   google_cancelled: "Google sign-in was cancelled.",
-  google_account_not_found: "No Plato account is connected to that Google account. Create an account first.",
+  google_account_not_found: "No Plato account was found. Continue to sign up to create one.",
+  google_registration_expired: "Your Google signup link expired. Continue with Google to start again.",
   google_email_in_use: "This Google account is already connected to a different Plato account. Sign in with that account or contact support.",
 };
 
@@ -18,14 +19,14 @@ export function GoogleAuthControls({
   return (
     <>
       {error && messages[error] && (
-        <p role="alert" className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-3.5 py-2.5 text-sm text-amber-800">
+        <p role="alert" className="mb-4 rounded-xl border border-amber-300/20 bg-amber-300/10 px-3.5 py-2.5 text-sm text-amber-100">
           {messages[error]}
         </p>
       )}
 
       <a
         href={`/api/auth/google?intent=${intent}`}
-        className="group flex w-full items-center justify-center gap-3 rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm font-semibold text-zinc-800 shadow-[0_3px_0_#d4d4d8,0_8px_18px_rgba(24,24,27,0.08)] transition-all duration-150 hover:-translate-y-0.5 hover:bg-zinc-50 hover:shadow-[0_4px_0_#d4d4d8,0_12px_22px_rgba(24,24,27,0.12)] active:translate-y-0.5 active:shadow-[0_1px_0_#d4d4d8] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-100"
+        className="group flex w-full items-center justify-center gap-3 rounded-xl border border-white/15 bg-white px-4 py-3.5 text-sm font-semibold text-zinc-900 shadow-[0_8px_24px_rgba(0,0,0,0.2)] transition-all duration-150 hover:-translate-y-0.5 hover:bg-zinc-100 hover:shadow-[0_12px_28px_rgba(0,0,0,0.25)] active:translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-orange-300/30"
       >
         <svg aria-hidden="true" className="h-5 w-5 transition-transform group-hover:scale-105" viewBox="0 0 48 48">
           <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5Z" />
@@ -35,7 +36,7 @@ export function GoogleAuthControls({
         </svg>
         Continue with Google
       </a>
-      <p className="my-4 flex items-center gap-3 text-xs text-zinc-400 before:h-px before:flex-1 before:bg-zinc-200 after:h-px after:flex-1 after:bg-zinc-200">
+      <p className="my-5 flex items-center gap-3 text-xs text-zinc-500 before:h-px before:flex-1 before:bg-white/10 after:h-px after:flex-1 after:bg-white/10">
         or continue with email
       </p>
     </>
